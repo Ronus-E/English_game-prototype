@@ -1,0 +1,3352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="MISSION: ENGLISH CLUB — The 180-Second Isometric Pixel-Art English Challenge for American Corner Exhibitions." />
+  <title>MISSION: ENGLISH CLUB — The 180-Second English Challenge</title>
+<style>
+  :root {
+    --bg-sky: #dceef8;
+    --panel-bg: #fffdf9;
+    --panel-soft: #f1f5f9;
+    --panel-border: #cbd5e1;
+    --accent-gold: #d97706;
+    --accent-gold-bg: #fef3c7;
+    --accent-red: #dc2626;
+    --accent-green: #059669;
+    --accent-green-bg: #d1fae5;
+    --accent-blue: #2563eb;
+    --accent-blue-bg: #dbeafe;
+    --text-main: #1e293b;
+    --text-muted: #475569;
+    --soft-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    --font-scale: 1;
+  }
+
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg-sky);
+    color: var(--text-main);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    font-size: calc(16px * var(--font-scale));
+  }
+
+  body.large-text {
+    --font-scale: 1.15;
+  }
+
+  canvas#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    background: var(--bg-sky);
+  }
+
+  /* Warm Daylight Cards & Clean Buttons */
+  .pixel-box {
+    background: var(--panel-bg);
+    border: 2px solid var(--panel-border);
+    box-shadow: var(--soft-shadow);
+    border-radius: 16px;
+  }
+
+  .pixel-box-gold {
+    background: var(--panel-bg);
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 12px 32px rgba(30, 41, 59, 0.14);
+    border-radius: 20px;
+  }
+
+  .retro-btn {
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1.5px solid transparent;
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 3px 0 #1d4ed8;
+    transition: transform 0.1s ease, background-color 0.15s ease, box-shadow 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 46px;
+    font-size: 0.95rem;
+  }
+  .retro-btn:hover:not(:disabled) {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+  .retro-btn:active:not(:disabled) {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.2);
+  }
+  .retro-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-gold {
+    background: #d97706;
+    color: #ffffff;
+    box-shadow: 0 3px 0 #b45309;
+  }
+  .btn-green {
+    background: #059669;
+    color: #ffffff;
+    box-shadow: 0 3px 0 #047857;
+  }
+  .btn-red {
+    background: #e11d48;
+    color: #ffffff;
+    box-shadow: 0 3px 0 #be123c;
+  }
+  .btn-slate {
+    background: #f1f5f9;
+    color: #1e293b;
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 0 #cbd5e1;
+  }
+  .btn-slate:hover:not(:disabled) {
+    background: #e2e8f0;
+  }
+  .btn-sm {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    min-height: 38px;
+    border-radius: 10px;
+  }
+
+  /* Pill Toggles on Start Menu */
+  .pill-group {
+    display: flex;
+    gap: 6px;
+    background: #f1f5f9;
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+  }
+  .pill-opt {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #475569;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 8px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .pill-opt.active {
+    background: #ffffff;
+    color: #1e293b;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+  }
+
+  /* Screen Overlays */
+  .screen-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: linear-gradient(180deg, rgba(220, 238, 248, 0.92) 0%, rgba(241, 245, 249, 0.95) 100%);
+    backdrop-filter: blur(4px);
+    overflow-y: auto;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-blue-bg);
+    border: 1px solid #93c5fd;
+    color: #1d4ed8;
+    padding: 5px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    margin-bottom: 10px;
+  }
+
+  .game-title {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: clamp(24px, 4.6vw, 40px);
+    font-weight: 900;
+    text-align: center;
+    line-height: 1.1;
+    margin: 0;
+    color: #0f172a;
+    letter-spacing: 0.5px;
+  }
+
+  .game-subtitle {
+    font-size: clamp(13px, 2vw, 16px);
+    font-weight: 700;
+    color: #d97706;
+    text-align: center;
+    margin: 6px 0 14px 0;
+    letter-spacing: 0.8px;
+  }
+
+  /* Simplified Clutter-Free HUD */
+  #hudLayer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px;
+  }
+
+  .hud-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .hud-pill {
+    pointer-events: auto;
+    background: rgba(255, 253, 249, 0.96);
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 8px 14px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .timer-display {
+    font-size: clamp(18px, 2.8vw, 24px);
+    font-weight: 900;
+    color: #0f172a;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-urgent {
+    color: #dc2626;
+  }
+
+  .objective-pill {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: space-between;
+    border-color: #93c5fd;
+  }
+
+  .xp-track {
+    width: 100%;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 5px;
+  }
+  .xp-fill {
+    height: 100%;
+    background: #10b981;
+    width: 0%;
+    transition: width 0.35s ease;
+  }
+
+  /* Bottom Controls */
+  .hud-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    gap: 12px;
+    padding-bottom: env(safe-area-inset-bottom, 4px);
+  }
+
+  .joystick-zone {
+    pointer-events: auto;
+    position: relative;
+    width: 104px;
+    height: 104px;
+    border-radius: 50%;
+    background: rgba(255, 253, 249, 0.85);
+    border: 2px solid #94a3b8;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+    touch-action: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .joystick-knob {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #2563eb;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+    position: absolute;
+    transform: translate(0px, 0px);
+    pointer-events: none;
+  }
+
+  .bottom-center-guide {
+    pointer-events: auto;
+    background: rgba(255, 253, 249, 0.95);
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 8px 14px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    max-width: 420px;
+  }
+
+  .action-cluster {
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .primary-action-btn {
+    padding: 14px 20px;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    border: 2px solid #ffffff;
+    background: #059669;
+    color: #ffffff;
+    box-shadow: 0 4px 0 #047857, 0 8px 18px rgba(5, 150, 105, 0.28);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-height: 54px;
+    touch-action: manipulation;
+  }
+  .primary-action-btn.ready-talk {
+    background: #d97706;
+    box-shadow: 0 4px 0 #b45309, 0 8px 18px rgba(217, 119, 6, 0.32);
+  }
+
+  /* Modal Dialog & Exercise Overlay */
+  #modalLayer {
+    position: fixed;
+    inset: 0;
+    z-index: 600;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px;
+    overflow-y: auto;
+  }
+
+  .modal-card {
+    width: 100%;
+    max-width: 640px;
+    max-height: 92vh;
+    overflow-y: auto;
+    padding: 22px;
+    position: relative;
+  }
+
+  .npc-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-bottom: 1.5px solid #e2e8f0;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+  }
+
+  .npc-portrait {
+    width: 56px;
+    height: 56px;
+    border: 2px solid #cbd5e1;
+    border-radius: 14px;
+    background: #f1f5f9;
+    flex-shrink: 0;
+  }
+
+  .option-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  @media (min-width: 560px) {
+    .option-grid.two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .option-btn {
+    text-align: left;
+    justify-content: flex-start;
+    padding: 14px 16px;
+    font-size: 0.96rem;
+    font-weight: 600;
+    line-height: 1.4;
+    min-height: 52px;
+    background: #f8fafc;
+    border: 2px solid #cbd5e1;
+    color: #1e293b;
+    box-shadow: 0 2px 0 #cbd5e1;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: #2563eb;
+    background: #eff6ff;
+  }
+  .option-btn.correct {
+    background: #d1fae5;
+    border-color: #059669;
+    color: #064e3b;
+    box-shadow: 0 2px 0 #059669;
+  }
+  .option-btn.wrong {
+    background: #ffe4e6;
+    border-color: #e11d48;
+    color: #881337;
+    box-shadow: 0 2px 0 #e11d48;
+  }
+
+  .feedback-box {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 12px;
+    border-left: 5px solid #2563eb;
+    background: #f1f5f9;
+    color: #1e293b;
+    font-size: 0.92rem;
+    line-height: 1.5;
+  }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  .badge-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+  }
+
+  #toastBox {
+    position: fixed;
+    top: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 800;
+    background: #1e293b;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.88rem;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    text-align: center;
+    max-width: 90vw;
+  }
+  #toastBox.show {
+    opacity: 1;
+  }
+
+  .map-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  @media (max-width: 600px) {
+    .hud-pill { padding: 6px 10px; border-radius: 12px; }
+    .joystick-zone { width: 88px; height: 88px; }
+    .joystick-knob { width: 36px; height: 36px; }
+    .bottom-center-guide { display: none; }
+    .modal-card { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="toastBox"></div>
+
+<!-- MAIN ISOMETRIC CAMPUS CANVAS -->
+<canvas id="gameCanvas"></canvas>
+
+<!-- =========================================================
+     1. STREAMLINED SPLASH & QUICK-START MAIN MENU
+     ========================================================= -->
+<div id="screenStart" class="screen-layer">
+  <div class="pixel-box-gold" style="max-width: 580px; width: 100%; padding: 26px; text-align: center;">
+    <div class="logo-badge">★ AMERICAN CORNER ENGLISH CLUBS EXHIBITION</div>
+
+    <!-- Clean Pixel Emblem -->
+    <div style="margin: 4px auto 10px auto; width: 72px; height: 72px;">
+      <svg viewBox="0 0 16 16" width="72" height="72" shape-rendering="crispEdges" style="border: 2px solid #cbd5e1; border-radius: 16px; background: #eff6ff; box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);">
+        <rect x="2" y="1" width="12" height="10" fill="#2563eb"/>
+        <rect x="2" y="11" width="12" height="2" fill="#e11d48"/>
+        <rect x="3" y="13" width="10" height="1" fill="#ffffff"/>
+        <rect x="4" y="14" width="8" height="1" fill="#e11d48"/>
+        <rect x="3" y="2" width="1" height="1" fill="#fbbf24"/>
+        <rect x="5" y="2" width="1" height="1" fill="#fbbf24"/>
+        <rect x="4" y="4" width="1" height="1" fill="#fbbf24"/>
+        <rect x="7" y="4" width="2" height="2" fill="#fbbf24"/>
+        <rect x="7" y="3" width="2" height="1" fill="#f97316"/>
+        <rect x="6" y="6" width="4" height="4" fill="#ffffff"/>
+        <rect x="7" y="7" width="2" height="2" fill="#38bdf8"/>
+      </svg>
+    </div>
+
+    <h1 class="game-title">MISSION: ENGLISH CLUB</h1>
+    <div class="game-subtitle">THE 180-SECOND ENGLISH CHALLENGE</div>
+
+    <p style="color: #475569; font-size: 0.94rem; line-height: 1.5; max-width: 480px; margin: 0 auto 18px auto;">
+      Explore a sunny American university campus, chat with club coaches, and complete 5 quick English challenges in 3 minutes!
+    </p>
+
+    <!-- Simple Pill Selectors -->
+    <div style="display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 20px;">
+      <div>
+        <div style="font-size: 0.78rem; font-weight: 800; color: #475569; margin-bottom: 5px; text-transform: uppercase;">
+          1. English Level / Niveau
+        </div>
+        <div class="pill-group" id="levelPills">
+          <button type="button" class="pill-opt" data-val="A1">A1 Beginner</button>
+          <button type="button" class="pill-opt active" data-val="A2">A2 Elementary</button>
+          <button type="button" class="pill-opt" data-val="B1">B1 Intermediate</button>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 800; color: #475569; margin-bottom: 5px; text-transform: uppercase;">
+            2. Help Language
+          </div>
+          <div class="pill-group" id="langPills">
+            <button type="button" class="pill-opt" data-val="EN">🇬🇧 English</button>
+            <button type="button" class="pill-opt active" data-val="FR">🇫🇷 EN + FR</button>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 800; color: #475569; margin-bottom: 5px; text-transform: uppercase;">
+            3. Visual Comfort
+          </div>
+          <div class="pill-group" id="comfortPills">
+            <button type="button" class="pill-opt active" data-val="STANDARD">☀️ Standard</button>
+            <button type="button" class="pill-opt" data-val="CALM">🌿 Calm / Large</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primary One-Click Play CTA -->
+    <button id="btnStartMission" class="retro-btn btn-green" style="width: 100%; font-size: 1.1rem; padding: 15px 24px; margin-bottom: 10px;">
+      ▶ PLAY NOW (3-MINUTE CHALLENGE)
+    </button>
+
+    <!-- Secondary Clean Actions -->
+    <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+      <button id="btnStartExplore" class="retro-btn btn-slate btn-sm" style="flex: 1 1 140px;">
+        🧭 Free Explore
+      </button>
+      <button id="btnOpenAchievements" class="retro-btn btn-slate btn-sm" style="flex: 1 1 140px;">
+        🏆 Badges (<span id="lblBadgeCount">0/8</span>)
+      </button>
+      <button id="btnOpenHowTo" class="retro-btn btn-slate btn-sm" style="flex: 1 1 120px;">
+        ❓ Guide
+      </button>
+    </div>
+
+    <div style="margin-top: 14px; font-size: 0.82rem; color: #64748b; display: flex; justify-content: center; gap: 18px;">
+      <span>🏅 Best: <strong id="lblBestScore" style="color: #d97706;">0</strong> pts</span>
+      <span>⭐ Level <strong id="lblPlayerLvl" style="color: #2563eb;">1</strong> (<span id="lblPlayerXp">0</span> XP)</span>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     2. CLUTTER-FREE 3-PILL IN-GAME HUD
+     ========================================================= -->
+<div id="hudLayer" class="hidden">
+  <!-- TOP BAR: 3 Essential Pills + Menu -->
+  <div class="hud-top">
+    <!-- Pill 1: Timer -->
+    <div class="hud-pill">
+      <span style="font-size: 1.2rem;">⏱</span>
+      <div>
+        <div style="font-size: 0.68rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Time</div>
+        <div id="hudTimer" class="timer-display">03:00</div>
+      </div>
+    </div>
+
+    <!-- Pill 2: Current Objective -->
+    <div class="hud-pill objective-pill">
+      <div style="min-width: 0; flex: 1;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span id="hudPhaseTag" class="badge-pill">STEP 1/6</span>
+          <span id="hudPhaseTitle" style="font-size: 0.88rem; font-weight: 800; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            WELCOME TO CAMPUS
+          </span>
+        </div>
+        <div id="hudPhaseObjective" style="font-size: 0.8rem; color: #475569; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+          Meet Coach Maya at the English Club Hub
+        </div>
+        <div class="xp-track">
+          <div id="hudMissionProgress" class="xp-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pill 3: Score & Single Clean Menu Button -->
+    <div class="hud-pill">
+      <div style="text-align: right;">
+        <div style="font-size: 0.68rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Score (<span id="hudLevelBadge">A2</span>)</div>
+        <div id="hudScore" style="font-size: 1.2rem; font-weight: 900; color: #059669;">0</div>
+      </div>
+      <button id="btnPause" class="retro-btn btn-slate btn-sm" title="Menu & Settings (Esc)">☰ Menu</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR: Easy Touch Joystick + Clear Smart Action Button -->
+  <div class="hud-bottom">
+    <div id="joystickZone" class="joystick-zone" aria-label="Movement Joystick">
+      <div id="joystickKnob" class="joystick-knob"></div>
+    </div>
+
+    <div id="nearbyBanner" class="bottom-center-guide">
+      <div id="nearbyName" style="font-size: 0.85rem; font-weight: 800; color: #0f172a;">
+        Tap anywhere on campus to walk
+      </div>
+      <div id="nearbyHint" style="font-size: 0.78rem; color: #475569;">
+        Or tap the green button on the right to jump to your next stop
+      </div>
+    </div>
+
+    <div class="action-cluster">
+      <button id="btnSmartAction" class="primary-action-btn" aria-label="Next Stop or Interact">
+        <span id="btnSmartIcon">⚡</span>
+        <span id="btnSmartLabel">NEXT STOP</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     3. SPACIOUS MODAL LAYER (NPC, CHALLENGES, MENU, RESULTS)
+     ========================================================= -->
+<div id="modalLayer" class="hidden">
+  <div id="modalContent" class="pixel-box modal-card"></div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* --------------------------------------------------------------------------
+     1. GENTLE WEB AUDIO CHIME SYNTHESIZER
+     -------------------------------------------------------------------------- */
+  class SoundEngine {
+    constructor() {
+      this.ctx = null;
+      this.muted = false;
+      this.bgmTimer = null;
+      this.bgmStep = 0;
+      this.bgmPlaying = false;
+    }
+
+    init() {
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) this.ctx = new AudioCtx();
+      }
+      if (this.ctx && this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
+      }
+    }
+
+    playTone(freq, type = 'sine', duration = 0.14, gainVal = 0.055, delay = 0) {
+      if (this.muted) return;
+      this.init();
+      if (!this.ctx) return;
+      try {
+        const now = this.ctx.currentTime + delay;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(gainVal, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      } catch (e) {}
+    }
+
+    sfxStep() {
+      this.playTone(190 + Math.random() * 20, 'sine', 0.04, 0.015);
+    }
+
+    sfxInteract() {
+      this.playTone(523.25, 'triangle', 0.09, 0.05, 0);
+      this.playTone(659.25, 'triangle', 0.11, 0.05, 0.06);
+    }
+
+    sfxCorrect() {
+      this.playTone(523.25, 'triangle', 0.11, 0.07, 0);
+      this.playTone(659.25, 'triangle', 0.11, 0.07, 0.08);
+      this.playTone(783.99, 'triangle', 0.16, 0.07, 0.16);
+      this.playTone(1046.50, 'sine', 0.26, 0.08, 0.24);
+    }
+
+    sfxWrong() {
+      this.playTone(261.63, 'sine', 0.16, 0.06, 0);
+      this.playTone(220.00, 'sine', 0.24, 0.06, 0.14);
+    }
+
+    sfxPhaseUp() {
+      const notes = [440, 554.37, 659.25, 880];
+      notes.forEach((n, i) => this.playTone(n, 'sine', 0.16, 0.06, i * 0.08));
+    }
+
+    sfxFanfare() {
+      const melody = [523.25, 659.25, 783.99, 1046.5, 783.99, 1046.5];
+      melody.forEach((n, i) => this.playTone(n, 'triangle', 0.18, 0.07, i * 0.11));
+    }
+
+    startBgm() {
+      if (this.bgmPlaying) return;
+      this.bgmPlaying = true;
+      const seq = [
+        261.63, 329.63, 392.00, 329.63,
+        349.23, 440.00, 523.25, 440.00,
+        392.00, 493.88, 587.33, 493.88,
+        261.63, 392.00, 329.63, 293.66
+      ];
+      this.bgmTimer = setInterval(() => {
+        if (this.muted || !this.bgmPlaying) return;
+        const note = seq[this.bgmStep % seq.length];
+        this.playTone(note, 'sine', 0.22, 0.014);
+        this.bgmStep++;
+      }, 360);
+    }
+
+    stopBgm() {
+      this.bgmPlaying = false;
+      if (this.bgmTimer) {
+        clearInterval(this.bgmTimer);
+        this.bgmTimer = null;
+      }
+    }
+
+    toggleMute() {
+      this.muted = !this.muted;
+      return this.muted;
+    }
+  }
+
+  const audio = new SoundEngine();
+
+  /* --------------------------------------------------------------------------
+     2. PERSISTENT SAVE STORAGE (XP, Level, Personal Best, Badges)
+     -------------------------------------------------------------------------- */
+  const STORAGE_KEY = 'mission_english_club_save_v1';
+
+  const BADGES_CATALOG = [
+    { id: 'first_steps', icon: '🎓', title: 'Campus Explorer', desc: 'Complete your first English Club session.' },
+    { id: 'vocab_wizard', icon: '🌿', title: 'Word Botanist', desc: 'Score 100% in Vocabulary Challenge.' },
+    { id: 'grammar_guru', icon: '🏛', title: 'Grammar Architect', desc: 'Score 100% in Grammar Challenge.' },
+    { id: 'active_listener', icon: '🎧', title: 'Sharp Ear', desc: 'Complete the Listening & Speaking stage.' },
+    { id: 'usa_scholar', icon: '🗽', title: 'Americanist', desc: 'Master American Culture & Geography.' },
+    { id: 'speed_ace', icon: '⚡', title: '180s Legend', desc: 'Finish a 3-minute mission with 600+ points.' },
+    { id: 'b1_master', icon: '🏆', title: 'B1 Honors', desc: 'Complete a challenge on B1 Intermediate.' },
+    { id: 'all_campus', icon: '🗺', title: 'Grand Tour', desc: 'Visit at least 6 different campus buildings.' }
+  ];
+
+  function loadSaveData() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        return {
+          xp: parsed.xp || 0,
+          bestScore: parsed.bestScore || 0,
+          sessionsPlayed: parsed.sessionsPlayed || 0,
+          badges: Array.isArray(parsed.badges) ? parsed.badges : [],
+          visitedBuildings: Array.isArray(parsed.visitedBuildings) ? parsed.visitedBuildings : []
+        };
+      }
+    } catch (e) {}
+    return { xp: 0, bestScore: 0, sessionsPlayed: 0, badges: [], visitedBuildings: [] };
+  }
+
+  let saveData = loadSaveData();
+
+  function persistSaveData() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+    } catch (e) {}
+    updateStartScreenStats();
+  }
+
+  function getPlayerLevel(xp) {
+    return Math.floor(xp / 250) + 1;
+  }
+
+  function unlockBadge(badgeId) {
+    if (!saveData.badges.includes(badgeId)) {
+      saveData.badges.push(badgeId);
+      const b = BADGES_CATALOG.find(x => x.id === badgeId);
+      if (b) showToast(`🎖 Badge Unlocked: ${b.icon} ${b.title}!`);
+      persistSaveData();
+    }
+  }
+
+  function updateStartScreenStats() {
+    document.getElementById('lblBestScore').textContent = saveData.bestScore;
+    document.getElementById('lblPlayerLvl').textContent = getPlayerLevel(saveData.xp);
+    document.getElementById('lblPlayerXp').textContent = saveData.xp;
+    document.getElementById('lblBadgeCount').textContent = `${saveData.badges.length}/${BADGES_CATALOG.length}`;
+  }
+
+  /* --------------------------------------------------------------------------
+     3. EDUCATIONAL QUESTION BANK (CEFR A1, A2, B1 + BILINGUAL FRENCH SUPPORT)
+     -------------------------------------------------------------------------- */
+  const QUESTION_BANK = {
+    VOCABULARY: {
+      A1: [
+        {
+          objective: 'Identify everyday academic nouns',
+          frHint: 'Identifiez les lieux de l’école.',
+          icon: '📚',
+          prompt: 'You borrow books and read quietly in this campus building. What is it?',
+          options: ['Library', 'Cafeteria', 'Stadium', 'Garage'],
+          answer: 0,
+          explanation: 'A "Library" is where students read and borrow books. A cafeteria is for eating.'
+        },
+        {
+          objective: 'Understand action verbs in context',
+          frHint: 'Choisissez le bon verbe d’action.',
+          icon: '🗣️',
+          prompt: 'At the English Club, members _____ English together every Friday.',
+          options: ['speak', 'sleep', 'swim', 'drive'],
+          answer: 0,
+          explanation: '"Speak" means to talk using a language. Members speak English to practice!'
+        },
+        {
+          objective: 'Match weather & season vocabulary',
+          frHint: 'Associez le vocabulaire des saisons.',
+          icon: '🍂',
+          prompt: 'In the United States, university classes usually start in September during _____.',
+          options: ['Autumn / Fall', 'Winter', 'Midnight', 'Summer break'],
+          answer: 0,
+          explanation: 'In American English, the season between summer and winter is called "Fall" or "Autumn".'
+        },
+        {
+          objective: 'Identify adjectives describing feelings',
+          frHint: 'Choisissez l’adjectif qui exprime l’enthousiasme.',
+          icon: '😄',
+          prompt: 'Maria just won the English spelling bee! She feels very _____.',
+          options: ['excited', 'hungry', 'sleepy', 'rainy'],
+          answer: 0,
+          explanation: '"Excited" describes feeling very happy and enthusiastic about a great event.'
+        }
+      ],
+      A2: [
+        {
+          objective: 'Understand academic & club vocabulary in context',
+          frHint: 'Trouvez le mot qui signifie "rejoindre".',
+          icon: '🤝',
+          prompt: 'Would you like to _____ our debate team at the American Corner this semester?',
+          options: ['join', 'cancel', 'borrow', 'repair'],
+          answer: 0,
+          explanation: '"Join" means to become a member of a club, group, or activity.'
+        },
+        {
+          objective: 'Distinguish travel & campus direction words',
+          frHint: 'Quel mot désigne un plan d’orientation ?',
+          icon: '🧭',
+          prompt: 'New students use a campus _____ to find the Grammar Classroom and Writing Office.',
+          options: ['map', 'menu', 'receipt', 'ticket'],
+          answer: 0,
+          explanation: 'A "map" shows streets, buildings, and paths so you do not get lost.'
+        },
+        {
+          objective: 'Identify synonyms for communication',
+          frHint: 'Quel mot signifie "améliorer" ?',
+          icon: '📈',
+          prompt: 'Practicing for three minutes every day will help you _____ your vocabulary.',
+          options: ['improve', 'forget', 'hide', 'drop'],
+          answer: 0,
+          explanation: '"Improve" means to make something better through practice.'
+        },
+        {
+          objective: 'Understand community event vocabulary',
+          frHint: 'Choisissez le mot désignant le public.',
+          icon: '🎤',
+          prompt: 'Fifty students sat in the _____ to listen to the speeches on the Speaking Stage.',
+          options: ['audience', 'kitchen', 'traffic', 'luggage'],
+          answer: 0,
+          explanation: 'The "audience" is the group of people watching or listening to a performance or speech.'
+        }
+      ],
+      B1: [
+        {
+          objective: 'Select precise academic & leadership terms',
+          frHint: 'Choisissez le terme qui exprime la confiance en soi.',
+          icon: '🌟',
+          prompt: 'Public speaking workshops build _____ so students can express ideas clearly without fear.',
+          options: ['confidence', 'hesitation', 'confusion', 'reluctance'],
+          answer: 0,
+          explanation: '"Confidence" is the feeling of trusting your own abilities when speaking or performing.'
+        },
+        {
+          objective: 'Infer meaning from context clues',
+          frHint: 'Déduisez le sens grâce au contexte.',
+          icon: '🧩',
+          prompt: 'Because the project was complex, students had to _____ and share research duties.',
+          options: ['collaborate', 'postpone', 'withdraw', 'ignore'],
+          answer: 0,
+          explanation: '"Collaborate" means working together cooperatively toward a shared goal.'
+        },
+        {
+          objective: 'Distinguish nuanced adjectives',
+          frHint: 'Quel adjectif décrit une expérience enrichissante ?',
+          icon: '🌎',
+          prompt: 'Meeting exchange students from different countries is a truly _____ experience.',
+          options: ['rewarding', 'tedious', 'negligible', 'fragile'],
+          answer: 0,
+          explanation: '"Rewarding" describes something that gives personal satisfaction and valuable growth.'
+        },
+        {
+          objective: 'Use idiomatic campus expressions',
+          frHint: 'Quelle expression signifie "briser la glace" ?',
+          icon: '🧊',
+          prompt: 'We played a quick introduction game to _____ among the new club members.',
+          options: ['break the ice', 'miss the boat', 'hit the sack', 'spill the beans'],
+          answer: 0,
+          explanation: '"Break the ice" means to help people feel relaxed and friendly when meeting for the first time.'
+        }
+      ]
+    },
+
+    GRAMMAR: {
+      A1: [
+        {
+          objective: 'Use Present Simple with third-person singular',
+          frHint: 'Accordez le verbe au présent simple avec "She".',
+          prompt: 'Complete the sentence: "Coach Maya _____ English at the American Corner."',
+          options: ['teaches', 'teach', 'teaching', 'to teach'],
+          answer: 0,
+          explanation: 'With he/she/it in the Present Simple, verbs ending in -ch add "-es" -> "teaches".'
+        },
+        {
+          objective: 'Choose correct prepositions of place',
+          frHint: 'Choisissez la préposition de lieu correcte.',
+          prompt: 'The students are sitting _____ the classroom right now.',
+          options: ['in', 'on', 'under', 'between'],
+          answer: 0,
+          explanation: 'We use "in" for enclosed spaces like a room, building, or classroom.'
+        },
+        {
+          objective: 'Form basic questions with "Do / Does"',
+          frHint: 'Complétez la question avec l’auxiliaire correct.',
+          prompt: '_____ you want to practice English with us today?',
+          options: ['Do', 'Does', 'Is', 'Are'],
+          answer: 0,
+          explanation: 'Use "Do" with "I, you, we, they" to form Present Simple questions.'
+        },
+        {
+          objective: 'Select correct subject pronouns & "to be"',
+          frHint: 'Choisissez la forme correcte de "to be".',
+          prompt: 'Hello! My name is Leo, and I _____ excited to be here.',
+          options: ['am', 'is', 'are', 'be'],
+          answer: 0,
+          explanation: 'The pronoun "I" always pairs with "am" in the Present Simple.'
+        }
+      ],
+      A2: [
+        {
+          objective: 'Distinguish Past Simple verbs',
+          frHint: 'Utilisez le prétérit avec "yesterday".',
+          prompt: 'Yesterday, our club _____ a documentary about U.S. National Parks.',
+          options: ['watched', 'watch', 'watching', 'watches'],
+          answer: 0,
+          explanation: '"Yesterday" signals a finished past action. Regular verb "watch" becomes "watched".'
+        },
+        {
+          objective: 'Use comparative adjectives accurately',
+          frHint: 'Formez le comparatif de supériorité.',
+          prompt: 'Speaking with a partner is _____ than memorizing lists alone.',
+          options: ['more effective', 'most effective', 'effectiver', 'as effective'],
+          answer: 0,
+          explanation: 'For long adjectives (3+ syllables like "effective"), use "more + adjective + than".'
+        },
+        {
+          objective: 'Identify and correct common grammatical errors',
+          frHint: 'Repérez la phrase grammaticalement correcte.',
+          prompt: 'Which sentence is grammatically CORRECT?',
+          options: [
+            'She doesn’t have any homework today.',
+            'She don’t has any homework today.',
+            'She doesn’t has any homework today.',
+            'She not have homework today.'
+          ],
+          answer: 0,
+          explanation: 'After "doesn’t", always use the base form of the verb ("have", not "has").'
+        },
+        {
+          objective: 'Choose between "much" and "many"',
+          frHint: 'Utilisez "many" devant un nom pluriel.',
+          prompt: 'How _____ books did you borrow from the Reading Library?',
+          options: ['many', 'much', 'little', 'a lot'],
+          answer: 0,
+          explanation: '"Books" is a countable plural noun, so we ask "How many books...?"'
+        }
+      ],
+      B1: [
+        {
+          objective: 'Use Present Perfect for life experiences',
+          frHint: 'Utilisez le Present Perfect pour une expérience.',
+          prompt: '_____ you ever visited an American Corner or cultural center before?',
+          options: ['Have', 'Did', 'Were', 'Has'],
+          answer: 0,
+          explanation: 'Present Perfect ("Have + subject + ever + past participle") asks about life experiences.'
+        },
+        {
+          objective: 'Apply First Conditional for real future possibilities',
+          frHint: 'Complétez la conditionnelle de type 1.',
+          prompt: 'If our team _____ the final round, we will represent our university at the exhibition.',
+          options: ['wins', 'will win', 'won', 'would win'],
+          answer: 0,
+          explanation: 'In First Conditional sentences, use Present Simple ("wins") in the "if" clause and "will + verb" in the main clause.'
+        },
+        {
+          objective: 'Use relative clauses accurately',
+          frHint: 'Choisissez le pronom relatif de lieu.',
+          prompt: 'The Speaking Stage is the place _____ students deliver their three-minute talks.',
+          options: ['where', 'which', 'who', 'whose'],
+          answer: 0,
+          explanation: '"Where" is the relative adverb used to refer to a physical location or place.'
+        },
+        {
+          objective: 'Spot verb-pattern rules',
+          frHint: 'Quel verbe est suivi de -ing ?',
+          prompt: 'Complete the sentence: "Many learners enjoy _____ role-play dialogues with NPCs."',
+          options: ['practicing', 'to practice', 'practice', 'practiced'],
+          answer: 0,
+          explanation: 'The verb "enjoy" is always followed by a gerund (-ing form), never an infinitive.'
+        }
+      ]
+    },
+
+    LISTENING: {
+      A1: [
+        {
+          objective: 'Comprehend basic personal introductions',
+          frHint: 'Écoutez la présentation de Sarah.',
+          transcript: 'Hi! My name is Sarah. I am from Chicago, and I love reading mystery books at the campus library.',
+          prompt: 'Where is Sarah from, and what does she love doing?',
+          options: [
+            'She is from Chicago and loves reading books.',
+            'She is from Boston and loves playing soccer.',
+            'She is from London and loves cooking.',
+            'She is from Texas and loves painting.'
+          ],
+          answer: 0,
+          explanation: 'Sarah clearly states: "I am from Chicago, and I love reading mystery books."'
+        },
+        {
+          objective: 'Understand simple campus directions & times',
+          frHint: 'Écoutez l’horaire de la réunion.',
+          transcript: 'Attention students! The English Club meeting starts at three o’clock in the afternoon at the central plaza.',
+          prompt: 'When and where does the English Club meeting start?',
+          options: [
+            'At 3:00 PM at the central plaza.',
+            'At 9:00 AM in the cafeteria.',
+            'At 5:00 PM at the stadium.',
+            'At 12:00 PM in the library.'
+          ],
+          answer: 0,
+          explanation: '"Three o’clock in the afternoon" is 3:00 PM, and the location is the "central plaza".'
+        }
+      ],
+      A2: [
+        {
+          objective: 'Extract key details from a cafe dialogue',
+          frHint: 'Écoutez la commande au salon.',
+          transcript: 'Barista: Welcome to the Listening Lounge! What can I get you? Student: I would like a medium iced tea and a blueberry muffin, please. Barista: That will be five dollars.',
+          prompt: 'What did the student order and how much does it cost?',
+          options: [
+            'An iced tea and a blueberry muffin for $5.',
+            'A hot coffee and a sandwich for $8.',
+            'Orange juice and a cookie for $3.',
+            'Water and a salad for $6.'
+          ],
+          answer: 0,
+          explanation: 'The student ordered "a medium iced tea and a blueberry muffin" totaling "five dollars".'
+        },
+        {
+          objective: 'Understand announcements about club activities',
+          frHint: 'Écoutez l’annonce sur l’atelier.',
+          transcript: 'Don’t forget that tomorrow’s journalism workshop in the Writing Office will focus on interviewing exchange students for the campus newspaper.',
+          prompt: 'What is the main topic of tomorrow’s workshop?',
+          options: [
+            'Interviewing exchange students for the newspaper.',
+            'Fixing computers in the science lab.',
+            'Preparing food for the cultural festival.',
+            'Practicing basketball at the arena.'
+          ],
+          answer: 0,
+          explanation: 'The announcement states the workshop focuses on "interviewing exchange students for the campus newspaper".'
+        }
+      ],
+      B1: [
+        {
+          objective: 'Infer speaker purpose and main advice',
+          frHint: 'Écoutez le conseil de présentation.',
+          transcript: 'When giving a presentation in English, don’t worry about speaking fast. Focus on clear pronunciation, steady eye contact, and organizing your ideas into three simple points.',
+          prompt: 'What does the speaker emphasize as most important for a good presentation?',
+          options: [
+            'Clarity, eye contact, and organizing ideas into three points.',
+            'Speaking as rapidly as possible without pausing.',
+            'Reading every single word from a long script.',
+            'Using complex vocabulary that nobody understands.'
+          ],
+          answer: 0,
+          explanation: 'The speaker advises focusing on "clear pronunciation, steady eye contact, and organizing your ideas".'
+        },
+        {
+          objective: 'Comprehend cultural discussion details',
+          frHint: 'Écoutez le rôle des American Corners.',
+          transcript: 'American Corners around the world serve as open cultural and educational hubs where students can access English resources, attend workshops, and exchange ideas freely.',
+          prompt: 'According to the speaker, what is the primary role of an American Corner?',
+          options: [
+            'To serve as an open hub for English resources, workshops, and idea exchange.',
+            'To operate exclusively as a private embassy office.',
+            'To sell expensive textbooks to university professors.',
+            'To host professional sports tournaments.'
+          ],
+          answer: 0,
+          explanation: 'American Corners are welcoming cultural and learning spaces offering free access to resources and programs.'
+        }
+      ]
+    },
+
+    SPEAKING: {
+      A1: [
+        {
+          objective: 'Introduce yourself politely in English',
+          frHint: 'Présentez-vous en anglais.',
+          targetPhrase: 'Hello everyone, my name is Alex and I am happy to join the English Club.',
+          prompt: 'Read aloud or type a polite self-introduction for the English Club:',
+          keywords: ['hello', 'hi', 'name', 'english', 'club', 'happy', 'glad', 'nice']
+        }
+      ],
+      A2: [
+        {
+          objective: 'Ask for directions politely on campus',
+          frHint: 'Demandez poliment votre chemin vers la bibliothèque.',
+          targetPhrase: 'Excuse me, could you tell me how to get to the Reading Library?',
+          prompt: 'Ask a classmate for directions to the Reading Library:',
+          keywords: ['excuse', 'library', 'where', 'how', 'get', 'please', 'direction']
+        }
+      ],
+      B1: [
+        {
+          objective: 'Express an opinion on why learning English matters',
+          frHint: 'Expliquez pourquoi l’anglais est utile.',
+          targetPhrase: 'Learning English helps me connect with people worldwide and explore new educational opportunities.',
+          prompt: 'Share a short statement explaining why practicing English is valuable to you:',
+          keywords: ['english', 'learn', 'connect', 'people', 'world', 'study', 'future', 'communicate', 'opportunities']
+        }
+      ]
+    },
+
+    CULTURE: {
+      A1: [
+        {
+          objective: 'Identify major U.S. national landmarks',
+          frHint: 'Identifiez ce monument célèbre de New York.',
+          icon: '🗽',
+          prompt: 'Which famous monument in New York Harbor was a gift from France to the United States in 1886?',
+          options: ['The Statue of Liberty', 'The Golden Gate Bridge', 'Mount Rushmore', 'The Space Needle'],
+          answer: 0,
+          explanation: 'Verified Fact: Dedicated in 1886, the Statue of Liberty stands on Liberty Island in New York Harbor.'
+        },
+        {
+          objective: 'Recognize U.S. capital city & geography basics',
+          frHint: 'Quelle est la capitale des États-Unis ?',
+          icon: '🏛',
+          prompt: 'What is the capital city of the United States of America?',
+          options: ['Washington, D.C.', 'New York City', 'Los Angeles', 'Chicago'],
+          answer: 0,
+          explanation: 'Verified Fact: Washington, D.C. (District of Columbia) has been the U.S. capital since 1800.'
+        },
+        {
+          objective: 'Learn about American holidays and traditions',
+          frHint: 'Quelle fête est célébrée le 4 juillet ?',
+          icon: '🎆',
+          prompt: 'Which national holiday do Americans celebrate every year on July 4th?',
+          options: ['Independence Day', 'Thanksgiving', 'Labor Day', 'Memorial Day'],
+          answer: 0,
+          explanation: 'Verified Fact: Independence Day commemorates the adoption of the Declaration of Independence on July 4, 1776.'
+        }
+      ],
+      A2: [
+        {
+          objective: 'Explore U.S. physical geography and national parks',
+          frHint: 'Dans quel État se trouve le Grand Canyon ?',
+          icon: '🏜',
+          prompt: 'In which U.S. state is the Grand Canyon National Park located?',
+          options: ['Arizona', 'Florida', 'Maine', 'Ohio'],
+          answer: 0,
+          explanation: 'Verified Fact: The Grand Canyon, carved by the Colorado River, is located in northern Arizona.'
+        },
+        {
+          objective: 'Understand American university campus life',
+          frHint: 'Comment appelle-t-on les résidences étudiantes ?',
+          icon: '🏫',
+          prompt: 'On American university campuses, what are student residence buildings commonly called?',
+          options: ['Dormitories (Dorms)', 'Factories', 'Subways', 'Embassies'],
+          answer: 0,
+          explanation: 'Simplified Note: Student housing on U.S. college campuses is widely known as "dormitories" or "dorms".'
+        },
+        {
+          objective: 'Identify iconic American engineering landmarks',
+          frHint: 'Dans quel État se trouve le pont Golden Gate ?',
+          icon: '🌉',
+          prompt: 'The famous red-orange Golden Gate Bridge spans the strait connecting San Francisco Bay and the Pacific Ocean in which state?',
+          options: ['California', 'New York', 'Texas', 'Washington'],
+          answer: 0,
+          explanation: 'Verified Fact: Opened in 1937, the Golden Gate Bridge is located in San Francisco, California.'
+        }
+      ],
+      B1: [
+        {
+          objective: 'Understand U.S. cultural & literary institutions',
+          frHint: 'Quelle est la plus grande bibliothèque au monde ?',
+          icon: '📜',
+          prompt: 'Located in Washington, D.C., which institution is the oldest federal cultural institution in the U.S. and the largest library in the world?',
+          options: ['The Library of Congress', 'The Metropolitan Museum', 'Harvard Bookstore', 'The Smithsonian Zoo'],
+          answer: 0,
+          explanation: 'Verified Fact: Founded in 1800, the Library of Congress houses over 170 million items.'
+        },
+        {
+          objective: 'Distinguish U.S. geographic regions & rivers',
+          frHint: 'Quel grand fleuve traverse le centre des États-Unis ?',
+          icon: '🌊',
+          prompt: 'Which major river flows roughly 2,340 miles from northern Minnesota to the Gulf of Mexico?',
+          options: ['The Mississippi River', 'The Hudson River', 'The Potomac River', 'The Columbia River'],
+          answer: 0,
+          explanation: 'Verified Fact: The Mississippi River is one of North America’s largest river systems and vital to U.S. history and trade.'
+        },
+        {
+          objective: 'Understand American Thanksgiving history & tradition',
+          frHint: 'Quand célèbre-t-on Thanksgiving ?',
+          icon: '🦃',
+          prompt: 'In the United States, Thanksgiving is celebrated annually on which day?',
+          options: [
+            'The fourth Thursday of November',
+            'The first Monday of September',
+            'October 31st',
+            'The last Sunday of May'
+          ],
+          answer: 0,
+          explanation: 'Verified Fact: Since 1941, federal law has designated the fourth Thursday in November as Thanksgiving Day.'
+        }
+      ]
+    },
+
+    READING_WRITING: {
+      A1: [
+        {
+          objective: 'Read a short campus notice for key information',
+          frHint: 'Lisez l’affiche de la bibliothèque.',
+          passage: 'NOTICE: Welcome to the American Corner Reading Library! Open Monday to Friday from 8:30 AM to 6:00 PM. Please keep your phone on silent mode.',
+          prompt: 'What rule must visitors follow inside the Reading Library?',
+          options: [
+            'Keep phones on silent mode.',
+            'Bring loud musical instruments.',
+            'Visit only on Sundays.',
+            'Pay $20 at the door.'
+          ],
+          answer: 0,
+          explanation: 'The notice clearly instructs visitors: "Please keep your phone on silent mode."'
+        }
+      ],
+      A2: [
+        {
+          objective: 'Identify clear sentence structure in student writing',
+          frHint: 'Choisissez la phrase bien ponctuée.',
+          passage: 'You are writing a short article for the Campus Gazette about the English Club exhibition.',
+          prompt: 'Which sentence uses proper capitalization and punctuation?',
+          options: [
+            'Last Friday, students from five schools joined the English Club exhibition.',
+            'last friday students from five schools joined the english club exhibition',
+            'Last Friday students, from five schools, joined the English club Exhibition?',
+            'last Friday, Students from Five Schools joined the english Club.'
+          ],
+          answer: 0,
+          explanation: 'Proper nouns ("Friday", "English Club") and the start of the sentence are capitalized, ending with a period.'
+        }
+      ],
+      B1: [
+        {
+          objective: 'Evaluate coherence and topic sentences in academic writing',
+          frHint: 'Choisissez la meilleure phrase d’introduction.',
+          passage: 'Paragraph body: "First, interactive games reduce anxiety when making mistakes. Second, timed challenges encourage quick thinking in English. Finally, peer discussions build real communication habits."',
+          prompt: 'Which topic sentence best introduces this paragraph?',
+          options: [
+            'Educational games offer several key benefits for language learners.',
+            'Computer monitors come in many different screen sizes.',
+            'American geography includes fifty diverse states.',
+            'Libraries store thousands of printed encyclopedias.'
+          ],
+          answer: 0,
+          explanation: 'A strong topic sentence summarizes the main idea—here, the benefits of educational games for language learners.'
+        }
+      ]
+    }
+  };
+
+  /* --------------------------------------------------------------------------
+     4. PRACTICAL NPC CONVERSATION SCENARIOS
+     -------------------------------------------------------------------------- */
+  const NPC_SCENARIOS = {
+    HUB: {
+      npcName: 'Coach Maya',
+      role: 'English Club Coordinator',
+      avatarBg: '#dbeafe',
+      greeting: 'Welcome to the American Corner Campus! I am Coach Maya. Ready to lead your team in the 180-Second English Challenge?',
+      frSub: 'Bienvenue sur le campus ! Prêt(e) à relever le défi de 180 secondes ?',
+      dialoguePrompt: 'How do you introduce yourself when joining an English Club for the first time?',
+      choices: [
+        {
+          text: '"Hi Coach Maya! I’m excited to join the club and practice my English today."',
+          reply: 'Fantastic energy! Clear, friendly, and confident. Let’s head to our first challenge!',
+          bonus: 40
+        },
+        {
+          text: '"Hello. Where is the exit?"',
+          reply: 'Haha, don’t leave yet! We have awesome interactive zones waiting for you on campus.',
+          bonus: 15
+        }
+      ]
+    },
+    LIBRARY_CHAT: {
+      npcName: 'Librarian Claire',
+      role: 'Reading & Writing Mentor',
+      avatarBg: '#f3e8ff',
+      greeting: 'Welcome to the Reading Library & Writing Office! Let’s sharpen your reading comprehension and writing clarity.',
+      frSub: 'Bienvenue à la bibliothèque ! Renforçons votre compréhension écrite.',
+      dialoguePrompt: 'How do you politely ask a librarian for book recommendations?',
+      choices: [
+        {
+          text: '"Excuse me, could you recommend an interesting book for my English level?"',
+          reply: 'I would love to! Let’s test your reading and writing skills right now.',
+          bonus: 40
+        },
+        {
+          text: '"I want books."',
+          reply: 'You are in the right place! Try asking "Could you recommend a book?" next time.',
+          bonus: 15
+        }
+      ]
+    }
+  };
+
+  /* --------------------------------------------------------------------------
+     5. WARM DAYLIGHT ISOMETRIC CAMPUS WORLD (10 INTERACTIVE LOCATIONS)
+     -------------------------------------------------------------------------- */
+  const MAP_SIZE = 34;
+  const TILE_W = 64;
+  const TILE_H = 32;
+
+  const CAMPUS_BUILDINGS = [
+    {
+      id: 'HUB',
+      num: 1,
+      name: 'ENGLISH CLUB HUB',
+      short: 'CLUB HUB',
+      skill: 'INTRO',
+      gx: 16, gy: 16, w: 3, d: 3, h: 42,
+      doorX: 16.5, doorY: 19.3,
+      roofColor: '#4a7c9b', wallLeft: '#6497b8', wallRight: '#3c6884', trim: '#fef3c7',
+      desc: 'Central plaza & mission headquarters. Meet Coach Maya!'
+    },
+    {
+      id: 'VOCAB',
+      num: 2,
+      name: 'VOCABULARY GARDEN',
+      short: 'VOCAB GARDEN',
+      skill: 'VOCABULARY',
+      gx: 8, gy: 10, w: 3, d: 3, h: 32,
+      doorX: 8.5, doorY: 13.3,
+      roofColor: '#4d8b6f', wallLeft: '#68a68a', wallRight: '#3b7058', trim: '#fef9c3',
+      desc: 'Botanical courtyard with word statues & context clues.'
+    },
+    {
+      id: 'GRAMMAR',
+      num: 3,
+      name: 'GRAMMAR CLASSROOM',
+      short: 'GRAMMAR HALL',
+      skill: 'GRAMMAR',
+      gx: 23, gy: 9, w: 3, d: 3, h: 46,
+      doorX: 23.5, doorY: 12.3,
+      roofColor: '#c46849', wallLeft: '#d97e60', wallRight: '#a65135', trim: '#fffbeb',
+      desc: 'Warm terracotta hall for sentence structure & grammar.'
+    },
+    {
+      id: 'LISTENING',
+      num: 4,
+      name: 'LISTENING LOUNGE',
+      short: 'AUDIO LOUNGE',
+      skill: 'LISTENING',
+      gx: 7, gy: 21, w: 3, d: 3, h: 36,
+      doorX: 7.5, doorY: 24.3,
+      roofColor: '#c89346', wallLeft: '#deaa5c', wallRight: '#a67632', trim: '#fef3c7',
+      desc: 'Sunny audio cafe with spoken dialogues & transcripts.'
+    },
+    {
+      id: 'SPEAKING',
+      num: 5,
+      name: 'SPEAKING STAGE',
+      short: 'SPEAKING STAGE',
+      skill: 'SPEAKING',
+      gx: 14, gy: 25, w: 4, d: 3, h: 26,
+      doorX: 15.0, doorY: 28.3,
+      roofColor: '#7f6da3', wallLeft: '#9886bd', wallRight: '#655487', trim: '#fef3c7',
+      desc: 'Open-air amphitheater for voice & written expression.'
+    },
+    {
+      id: 'LIBRARY',
+      num: 6,
+      name: 'READING LIBRARY',
+      short: 'LIBRARY',
+      skill: 'READING',
+      gx: 24, gy: 18, w: 3, d: 3, h: 48,
+      doorX: 24.5, doorY: 21.3,
+      roofColor: '#488286', wallLeft: '#619ca0', wallRight: '#36676b', trim: '#f8fafc',
+      desc: 'Quiet reading sanctuary & comprehension archive.'
+    },
+    {
+      id: 'WRITING',
+      num: 7,
+      name: 'WRITING OFFICE',
+      short: 'WRITING PRESS',
+      skill: 'WRITING',
+      gx: 24, gy: 25, w: 3, d: 3, h: 38,
+      doorX: 24.5, doorY: 28.3,
+      roofColor: '#5c6fa8', wallLeft: '#7689c2', wallRight: '#46578c', trim: '#e0f2fe',
+      desc: 'Campus Gazette pressroom & journalism desk.'
+    },
+    {
+      id: 'CULTURE',
+      num: 8,
+      name: 'AMERICAN CULTURE ZONE',
+      short: 'USA PAVILION',
+      skill: 'CULTURE',
+      gx: 15, gy: 6, w: 4, d: 3, h: 44,
+      doorX: 16.0, doorY: 9.3,
+      roofColor: '#b85454', wallLeft: '#5179a6', wallRight: '#3b5d85', trim: '#fef3c7',
+      desc: 'U.S. Geography Pavilion, Statue of Liberty & Landmarks.'
+    },
+    {
+      id: 'ARENA',
+      num: 9,
+      name: 'FINAL CHALLENGE ARENA',
+      short: 'FINAL ARENA',
+      skill: 'FINAL',
+      gx: 6, gy: 4, w: 3, d: 3, h: 52,
+      doorX: 6.5, doorY: 7.3,
+      roofColor: '#c9973e', wallLeft: '#dfa94f', wallRight: '#a3772b', trim: '#ffffff',
+      desc: 'Championship dome for the Grand Finale showdown!'
+    },
+    {
+      id: 'TROPHIES',
+      num: 10,
+      name: 'ACHIEVEMENT HALL',
+      short: 'TROPHY HALL',
+      skill: 'TROPHIES',
+      gx: 25, gy: 3, w: 3, d: 3, h: 40,
+      doorX: 25.5, doorY: 6.3,
+      roofColor: '#64748b', wallLeft: '#7d8fa6', wallRight: '#475569', trim: '#fef3c7',
+      desc: 'Hall of Fame displaying your badges, XP & records.'
+    }
+  ];
+
+  const CAMPUS_PROPS = [
+    { type: 'fountain', gx: 16.5, gy: 21.5 },
+    { type: 'liberty', gx: 13.5, gy: 7.5 },
+    { type: 'tree', gx: 4.5, gy: 12.5 },
+    { type: 'tree', gx: 11.5, gy: 14.5 },
+    { type: 'tree', gx: 20.5, gy: 14.5 },
+    { type: 'tree', gx: 11.5, gy: 21.5 },
+    { type: 'tree', gx: 20.5, gy: 22.5 },
+    { type: 'tree', gx: 5.5, gy: 17.5 },
+    { type: 'tree', gx: 29.5, gy: 13.5 },
+    { type: 'tree', gx: 29.5, gy: 23.5 },
+    { type: 'tree', gx: 10.5, gy: 29.5 },
+    { type: 'tree', gx: 20.5, gy: 29.5 },
+    { type: 'lamp', gx: 13.5, gy: 16.5 },
+    { type: 'lamp', gx: 19.5, gy: 16.5 },
+    { type: 'lamp', gx: 13.5, gy: 23.5 },
+    { type: 'lamp', gx: 19.5, gy: 23.5 }
+  ];
+
+  /* --------------------------------------------------------------------------
+     6. 180-SECOND MISSION TIMELINE CONFIGURATION
+     -------------------------------------------------------------------------- */
+  const MISSION_PHASES = [
+    {
+      index: 0,
+      startSec: 180,
+      endSec: 160,
+      tag: 'STEP 1/6',
+      title: 'WELCOME TO CAMPUS',
+      objective: 'Talk to Coach Maya at English Club Hub',
+      frObjective: 'Parlez à Coach Maya au Hub central',
+      targetBuildingId: 'HUB'
+    },
+    {
+      index: 1,
+      startSec: 160,
+      endSec: 120,
+      tag: 'STEP 2/6',
+      title: 'VOCABULARY GARDEN',
+      objective: 'Solve word & context puzzles in Vocabulary Garden',
+      frObjective: 'Défis de vocabulaire au Vocabulary Garden',
+      targetBuildingId: 'VOCAB'
+    },
+    {
+      index: 2,
+      startSec: 120,
+      endSec: 80,
+      tag: 'STEP 3/6',
+      title: 'GRAMMAR CLASSROOM',
+      objective: 'Complete sentence challenges in Grammar Hall',
+      frObjective: 'Défis de grammaire dans la Grammar Hall',
+      targetBuildingId: 'GRAMMAR'
+    },
+    {
+      index: 3,
+      startSec: 80,
+      endSec: 40,
+      tag: 'STEP 4/6',
+      title: 'LISTENING & SPEAKING',
+      objective: 'Practice audio or speech at Listening Lounge',
+      frObjective: 'Écoute et expression au Listening Lounge',
+      targetBuildingId: 'LISTENING'
+    },
+    {
+      index: 4,
+      startSec: 40,
+      endSec: 10,
+      tag: 'STEP 5/6',
+      title: 'AMERICAN DISCOVERY',
+      objective: 'Explore U.S. landmarks at American Culture Zone',
+      frObjective: 'Culture américaine à l’USA Pavilion',
+      targetBuildingId: 'CULTURE'
+    },
+    {
+      index: 5,
+      startSec: 10,
+      endSec: 0,
+      tag: 'STEP 6/6',
+      title: 'FINAL ARENA',
+      objective: 'Enter Final Challenge Arena for Grand Finale!',
+      frObjective: 'Entrez dans la Final Challenge Arena !',
+      targetBuildingId: 'ARENA'
+    }
+  ];
+
+  /* --------------------------------------------------------------------------
+     7. GAME STATE & ENGINE VARIABLES
+     -------------------------------------------------------------------------- */
+  const state = {
+    running: false,
+    paused: false,
+    modalOpen: false,
+    mode: 'MISSION',
+    cefr: 'A2',
+    frenchHelp: true,
+    calmMode: false,
+    timeRemaining: 180,
+    lastTimestamp: 0,
+    score: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    skillStats: {
+      VOCABULARY: { correct: 0, total: 0 },
+      GRAMMAR: { correct: 0, total: 0 },
+      LISTENING: { correct: 0, total: 0 },
+      SPEAKING: { completed: false, method: 'None' },
+      CULTURE: { correct: 0, total: 0 },
+      READING_WRITING: { correct: 0, total: 0 }
+    },
+    completedPhases: new Set(),
+    questionCursor: {},
+    player: {
+      gx: 16.5,
+      gy: 20.2,
+      vx: 0,
+      vy: 0,
+      speed: 5.4,
+      walkFrame: 0,
+      stepTimer: 0
+    },
+    camera: { x: 0, y: 0 },
+    nearbyBuilding: null,
+    particles: [],
+    animTick: 0
+  };
+
+  /* --------------------------------------------------------------------------
+     8. CANVAS SETUP & ISOMETRIC PROJECTION
+     -------------------------------------------------------------------------- */
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  let viewW = window.innerWidth;
+  let viewH = window.innerHeight;
+  let dpr = 1;
+
+  function resizeCanvas() {
+    viewW = window.innerWidth;
+    viewH = window.innerHeight;
+    dpr = state.calmMode ? 1 : Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(viewW * dpr);
+    canvas.height = Math.floor(viewH * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+  }
+
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function gridToIso(gx, gy) {
+    return {
+      x: (gx - gy) * (TILE_W * 0.5),
+      y: (gx + gy) * (TILE_H * 0.5)
+    };
+  }
+
+  function isoToGrid(sx, sy) {
+    return {
+      gx: (sx / (TILE_W * 0.5) + sy / (TILE_H * 0.5)) * 0.5,
+      gy: (sy / (TILE_H * 0.5) - sx / (TILE_W * 0.5)) * 0.5
+    };
+  }
+
+  /* --------------------------------------------------------------------------
+     9. COLLISION & WORLD NAVIGATION
+     -------------------------------------------------------------------------- */
+  function isBlocked(gx, gy) {
+    if (gx < 1.5 || gy < 1.5 || gx > MAP_SIZE - 2.5 || gy > MAP_SIZE - 2.5) {
+      return true;
+    }
+    for (const b of CAMPUS_BUILDINGS) {
+      if (
+        gx > b.gx - 0.35 &&
+        gx < b.gx + b.w + 0.35 &&
+        gy > b.gy - 0.35 &&
+        gy < b.gy + b.d + 0.35
+      ) {
+        return true;
+      }
+    }
+    const dx = gx - 16.5;
+    const dy = gy - 21.5;
+    if (dx * dx + dy * dy < 1.35) return true;
+    return false;
+  }
+
+  function findNearestBuilding() {
+    let best = null;
+    let bestDist = 2.6;
+    for (const b of CAMPUS_BUILDINGS) {
+      const dx = state.player.gx - b.doorX;
+      const dy = state.player.gy - b.doorY;
+      const dist = Math.hypot(dx, dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = b;
+      }
+    }
+    return best;
+  }
+
+  function teleportToBuilding(buildingId) {
+    const b = CAMPUS_BUILDINGS.find(x => x.id === buildingId);
+    if (!b) return;
+    state.player.gx = b.doorX;
+    state.player.gy = b.doorY + 0.25;
+    walkTarget = null;
+    spawnBurstParticles(b.doorX, b.doorY, '#2563eb', 10);
+    audio.sfxInteract();
+    showToast(`📍 Arrived at ${b.name}`);
+  }
+
+  /* --------------------------------------------------------------------------
+     10. WARM DAYLIGHT PIXEL-ART RENDERING PIPELINE
+     -------------------------------------------------------------------------- */
+  function getTileType(gx, gy) {
+    if (gx >= 13 && gx <= 20 && gy >= 15 && gy <= 24) return 'plaza';
+    if ((gx >= 15 && gx <= 17 && gy >= 6 && gy <= 29) ||
+        (gy >= 12 && gy <= 14 && gx >= 7 && gx <= 26) ||
+        (gy >= 20 && gy <= 22 && gx >= 6 && gx <= 26) ||
+        (gy >= 6 && gy <= 8 && gx >= 6 && gx <= 26)) {
+      return 'path';
+    }
+    if (gx >= 6 && gx <= 12 && gy >= 8 && gy <= 15) return 'garden';
+    return 'grass';
+  }
+
+  function drawIsoTile(gx, gy, type) {
+    const p = gridToIso(gx, gy);
+    const sx = Math.round(p.x - state.camera.x);
+    const sy = Math.round(p.y - state.camera.y);
+
+    if (sx < -80 || sx > viewW + 80 || sy < -80 || sy > viewH + 80) return;
+
+    ctx.beginPath();
+    ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + TILE_W * 0.5, sy + TILE_H * 0.5);
+    ctx.lineTo(sx, sy + TILE_H);
+    ctx.lineTo(sx - TILE_W * 0.5, sy + TILE_H * 0.5);
+    ctx.closePath();
+
+    const checker = (gx + gy) % 2 === 0;
+    if (type === 'plaza') {
+      ctx.fillStyle = checker ? '#f1ede4' : '#e5dfd2';
+    } else if (type === 'path') {
+      ctx.fillStyle = checker ? '#efe9dc' : '#e4dccb';
+    } else if (type === 'garden') {
+      ctx.fillStyle = checker ? '#96c993' : '#86ba83';
+    } else {
+      ctx.fillStyle = checker ? '#88b884' : '#7eaee0' && '#7da979';
+    }
+    ctx.fill();
+
+    // Very gentle grid line for low visual noise
+    ctx.strokeStyle = 'rgba(30, 41, 59, 0.06)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Soft pastel wildflowers in Vocabulary Garden
+    if (type === 'garden' && !state.calmMode && (gx * 7 + gy * 13) % 5 === 0) {
+      ctx.fillStyle = (gx + gy) % 2 === 0 ? '#f59e0b' : '#f43f5e';
+      ctx.fillRect(sx - 2, sy + 13, 3, 3);
+      ctx.fillStyle = '#fef08a';
+      ctx.fillRect(sx + 4, sy + 16, 2, 2);
+    }
+  }
+
+  function drawIsoBuilding(b, isActiveTarget, isPlayerNear) {
+    const pTop = gridToIso(b.gx, b.gy);
+    const pRight = gridToIso(b.gx + b.w, b.gy);
+    const pBottom = gridToIso(b.gx + b.w, b.gy + b.d);
+    const pLeft = gridToIso(b.gx, b.gy + b.d);
+
+    const cx = state.camera.x;
+    const cy = state.camera.y;
+
+    const topX = Math.round(pTop.x - cx), topY = Math.round(pTop.y - cy);
+    const rightX = Math.round(pRight.x - cx), rightY = Math.round(pRight.y - cy);
+    const botX = Math.round(pBottom.x - cx), botY = Math.round(pBottom.y - cy);
+    const leftX = Math.round(pLeft.x - cx), leftY = Math.round(pLeft.y - cy);
+    const h = b.h;
+
+    // Soft ambient ground shadow
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.16)';
+    ctx.beginPath();
+    ctx.moveTo(leftX - 5, leftY + 4);
+    ctx.lineTo(botX, botY + 7);
+    ctx.lineTo(rightX + 7, rightY + 4);
+    ctx.lineTo(topX, topY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Left Wall
+    ctx.fillStyle = b.wallLeft;
+    ctx.beginPath();
+    ctx.moveTo(leftX, leftY);
+    ctx.lineTo(botX, botY);
+    ctx.lineTo(botX, botY - h);
+    ctx.lineTo(leftX, leftY - h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Right Wall
+    ctx.fillStyle = b.wallRight;
+    ctx.beginPath();
+    ctx.moveTo(botX, botY);
+    ctx.lineTo(rightX, rightY);
+    ctx.lineTo(rightX, rightY - h);
+    ctx.lineTo(botX, botY - h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Roof Face
+    ctx.fillStyle = b.roofColor;
+    ctx.beginPath();
+    ctx.moveTo(topX, topY - h);
+    ctx.lineTo(rightX, rightY - h);
+    ctx.lineTo(botX, botY - h);
+    ctx.lineTo(leftX, leftY - h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Warm Cream Roof Trim
+    ctx.strokeStyle = b.trim;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Sunlit Windows
+    ctx.fillStyle = '#fef9c3';
+    const midLX = Math.round((leftX + botX) * 0.5);
+    const midLY = Math.round((leftY + botY) * 0.5);
+    ctx.fillRect(midLX - 14, midLY - h + 10, 7, 8);
+    ctx.fillRect(midLX + 6, midLY - h + 10, 7, 8);
+
+    const midRX = Math.round((botX + rightX) * 0.5);
+    const midRY = Math.round((botY + rightY) * 0.5);
+    ctx.fillRect(midRX - 12, midRY - h + 10, 7, 8);
+    ctx.fillRect(midRX + 5, midRY - h + 10, 7, 8);
+
+    // Entrance Door
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(midLX - 6, midLY - 16, 12, 16);
+    ctx.strokeStyle = b.trim;
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(midLX - 6, midLY - 16, 12, 16);
+
+    // Gentle Rooftop Flag
+    const wave = state.calmMode ? 0 : Math.sin(state.animTick * 0.08 + b.num) * 1.5;
+    const roofCenterX = Math.round((topX + botX) * 0.5);
+    const roofCenterY = Math.round((topY + botY) * 0.5 - h);
+    ctx.fillStyle = '#475569';
+    ctx.fillRect(roofCenterX - 1, roofCenterY - 16, 2, 16);
+    ctx.fillStyle = isActiveTarget ? '#f59e0b' : '#e11d48';
+    ctx.fillRect(roofCenterX + 1, roofCenterY - 16 + wave, 10, 6);
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(roofCenterX + 1, roofCenterY - 16 + wave, 4, 3);
+
+    // Interactive Welcome Mat
+    const doorPos = gridToIso(b.doorX, b.doorY);
+    const dx = Math.round(doorPos.x - cx);
+    const dy = Math.round(doorPos.y - cy);
+    ctx.fillStyle = isPlayerNear ? 'rgba(217, 119, 6, 0.45)' : 'rgba(37, 99, 235, 0.22)';
+    ctx.beginPath();
+    ctx.ellipse(dx, dy + 8, 16, 8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = isPlayerNear ? '#d97706' : '#2563eb';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Clean, High-Legibility Building Label
+    const labelText = `${b.num}. ${b.short}`;
+    ctx.font = 'bold 11px system-ui, -apple-system, sans-serif';
+    const textW = ctx.measureText(labelText).width + 14;
+    const bobOffset = (isActiveTarget && !state.calmMode) ? Math.abs(Math.sin(state.animTick * 0.06)) * 3 : 0;
+    const signY = roofCenterY - 24 - bobOffset;
+
+    ctx.fillStyle = isActiveTarget ? '#fef3c7' : 'rgba(255, 253, 249, 0.94)';
+    ctx.fillRect(Math.round(roofCenterX - textW * 0.5), Math.round(signY - 13), Math.round(textW), 18);
+    ctx.strokeStyle = isActiveTarget ? '#d97706' : '#94a3b8';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(Math.round(roofCenterX - textW * 0.5), Math.round(signY - 13), Math.round(textW), 18);
+
+    ctx.fillStyle = isActiveTarget ? '#92400e' : '#1e293b';
+    ctx.textAlign = 'center';
+    ctx.fillText(labelText, roofCenterX, Math.round(signY));
+  }
+
+  function drawProp(prop) {
+    const p = gridToIso(prop.gx, prop.gy);
+    const sx = Math.round(p.x - state.camera.x);
+    const sy = Math.round(p.y - state.camera.y);
+    if (sx < -60 || sx > viewW + 60 || sy < -60 || sy > viewH + 60) return;
+
+    if (prop.type === 'tree') {
+      ctx.fillStyle = 'rgba(30, 41, 59, 0.16)';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 12, 14, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#854d0e';
+      ctx.fillRect(sx - 3, sy - 6, 6, 18);
+      ctx.fillStyle = '#3f7d58';
+      ctx.fillRect(sx - 14, sy - 22, 28, 16);
+      ctx.fillStyle = '#529b6e';
+      ctx.fillRect(sx - 11, sy - 28, 22, 14);
+      ctx.fillStyle = '#6db889';
+      ctx.fillRect(sx - 7, sy - 33, 14, 8);
+    } else if (prop.type === 'lamp') {
+      ctx.fillStyle = '#475569';
+      ctx.fillRect(sx - 2, sy - 18, 4, 26);
+      ctx.fillStyle = '#fcd34d';
+      ctx.fillRect(sx - 4, sy - 23, 8, 6);
+    } else if (prop.type === 'fountain') {
+      ctx.fillStyle = '#94a3b8';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 10, 26, 13, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#7dd3fc';
+      ctx.beginPath();
+      ctx.ellipse(sx, sy + 8, 21, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+      const spoutH = state.calmMode ? 14 : 14 + Math.sin(state.animTick * 0.1) * 2;
+      ctx.fillStyle = '#f0f9ff';
+      ctx.fillRect(sx - 2, Math.round(sy + 6 - spoutH), 4, Math.round(spoutH));
+      ctx.fillRect(sx - 6, Math.round(sy + 6 - spoutH), 12, 3);
+    } else if (prop.type === 'liberty') {
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(sx - 9, sy - 4, 18, 16);
+      ctx.fillStyle = '#5eead4';
+      ctx.fillRect(sx - 6, sy - 24, 12, 20);
+      ctx.fillRect(sx - 4, sy - 30, 8, 6);
+      ctx.fillRect(sx + 5, sy - 34, 3, 14);
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillRect(sx + 4, sy - 38, 5, 4);
+    }
+  }
+
+  function drawNpcCharacter(gx, gy, shirtColor, hairColor) {
+    const p = gridToIso(gx, gy);
+    const sx = Math.round(p.x - state.camera.x);
+    const sy = Math.round(p.y - state.camera.y);
+    const bob = state.calmMode ? 0 : Math.round(Math.sin(state.animTick * 0.08 + gx) * 1.2);
+
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.2)';
+    ctx.beginPath();
+    ctx.ellipse(sx, sy + 12, 9, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(sx - 4, sy + 2, 3, 9);
+    ctx.fillRect(sx + 1, sy + 2, 3, 9);
+
+    ctx.fillStyle = shirtColor;
+    ctx.fillRect(sx - 5, sy - 8 + bob, 10, 11);
+
+    ctx.fillStyle = '#fed7aa';
+    ctx.fillRect(sx - 4, sy - 16 + bob, 8, 8);
+
+    ctx.fillStyle = hairColor;
+    ctx.fillRect(sx - 5, sy - 18 + bob, 10, 4);
+
+    // Friendly speech bubble badge
+    ctx.fillStyle = '#fffdf9';
+    ctx.fillRect(sx - 9, sy - 31 + bob, 18, 11);
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(sx - 9, sy - 31 + bob, 18, 11);
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 8px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Hi!', sx, sy - 23 + bob);
+  }
+
+  function drawPlayer() {
+    const p = gridToIso(state.player.gx, state.player.gy);
+    const sx = Math.round(p.x - state.camera.x);
+    const sy = Math.round(p.y - state.camera.y);
+    const moving = Math.hypot(state.player.vx, state.player.vy) > 0.05;
+    const legSwing = moving ? Math.round(Math.sin(state.player.walkFrame * 0.35) * 3) : 0;
+    const bodyBob = moving ? Math.abs(Math.round(Math.cos(state.player.walkFrame * 0.35) * 2)) : 0;
+
+    ctx.fillStyle = 'rgba(30, 41, 59, 0.25)';
+    ctx.beginPath();
+    ctx.ellipse(sx, sy + 12, 10, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#2563eb';
+    ctx.fillRect(sx - 5, sy + 2 + legSwing, 4, 9);
+    ctx.fillRect(sx + 1, sy + 2 - legSwing, 4, 9);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(sx - 5, sy + 9 + legSwing, 4, 2);
+    ctx.fillRect(sx + 1, sy + 9 - legSwing, 4, 2);
+
+    ctx.fillStyle = '#e11d48';
+    ctx.fillRect(sx - 6, sy - 9 - bodyBob, 12, 12);
+    ctx.fillStyle = '#fef08a';
+    ctx.fillRect(sx - 1, sy - 9 - bodyBob, 2, 12);
+
+    ctx.fillStyle = '#fde68a';
+    ctx.fillRect(sx - 4, sy - 17 - bodyBob, 8, 8);
+
+    ctx.fillStyle = '#1d4ed8';
+    ctx.fillRect(sx - 5, sy - 19 - bodyBob, 10, 4);
+    ctx.fillStyle = '#fbbf24';
+    ctx.fillRect(sx + 3, sy - 17 - bodyBob, 4, 2);
+
+    // Clean "YOU" indicator
+    ctx.fillStyle = '#2563eb';
+    ctx.beginPath();
+    ctx.moveTo(sx, sy - 23 - bodyBob);
+    ctx.lineTo(sx - 4, sy - 28 - bodyBob);
+    ctx.lineTo(sx + 4, sy - 28 - bodyBob);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function drawWaypointArrow(targetBuildingId) {
+    if (!targetBuildingId) return;
+    const target = CAMPUS_BUILDINGS.find(b => b.id === targetBuildingId);
+    if (!target) return;
+
+    const dx = target.doorX - state.player.gx;
+    const dy = target.doorY - state.player.gy;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 2.2) return;
+
+    const pPlayer = gridToIso(state.player.gx, state.player.gy);
+    const pTarget = gridToIso(target.doorX, target.doorY);
+    const angle = Math.atan2(pTarget.y - pPlayer.y, pTarget.x - pPlayer.x);
+
+    const px = Math.round(pPlayer.x - state.camera.x + Math.cos(angle) * 44);
+    const py = Math.round(pPlayer.y - state.camera.y + Math.sin(angle) * 44);
+
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.rotate(angle);
+    ctx.fillStyle = '#d97706';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(11, 0);
+    ctx.lineTo(-6, -6);
+    ctx.lineTo(-3, 0);
+    ctx.lineTo(-6, 6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function spawnBurstParticles(gx, gy, color, count = 8) {
+    if (state.calmMode) return;
+    const iso = gridToIso(gx, gy);
+    for (let i = 0; i < count; i++) {
+      const ang = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+      const spd = 20 + Math.random() * 40;
+      state.particles.push({
+        x: iso.x,
+        y: iso.y - 10,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - 16,
+        life: 0.55,
+        color
+      });
+    }
+  }
+
+  function updateAndDrawParticles(dt) {
+    for (let i = state.particles.length - 1; i >= 0; i--) {
+      const pt = state.particles[i];
+      pt.x += pt.vx * dt;
+      pt.y += pt.vy * dt;
+      pt.life -= dt;
+      if (pt.life <= 0) {
+        state.particles.splice(i, 1);
+        continue;
+      }
+      ctx.fillStyle = pt.color;
+      ctx.fillRect(Math.round(pt.x - state.camera.x), Math.round(pt.y - state.camera.y), 4, 4);
+    }
+  }
+
+  function renderWorld() {
+    ctx.fillStyle = '#dceef8';
+    ctx.fillRect(0, 0, viewW, viewH);
+
+    // 1. Ground Tiles
+    for (let sum = 0; sum <= (MAP_SIZE - 1) * 2; sum++) {
+      for (let gx = 0; gx < MAP_SIZE; gx++) {
+        const gy = sum - gx;
+        if (gy >= 0 && gy < MAP_SIZE) {
+          drawIsoTile(gx, gy, getTileType(gx, gy));
+        }
+      }
+    }
+
+    // 2. Depth-Sorted Entities
+    const activePhase = getCurrentMissionPhase();
+    const activeTargetId = state.mode === 'MISSION' && activePhase ? activePhase.targetBuildingId : null;
+
+    const renderables = [];
+
+    for (const b of CAMPUS_BUILDINGS) {
+      renderables.push({
+        depth: b.gx + b.w * 0.5 + b.gy + b.d * 0.5,
+        draw: () => drawIsoBuilding(b, b.id === activeTargetId, state.nearbyBuilding && state.nearbyBuilding.id === b.id)
+      });
+    }
+
+    for (const pr of CAMPUS_PROPS) {
+      renderables.push({
+        depth: pr.gx + pr.gy,
+        draw: () => drawProp(pr)
+      });
+    }
+
+    const npcs = [
+      { gx: 15.6, gy: 19.1, shirt: '#3b82f6', hair: '#1e293b' },
+      { gx: 6.7, gy: 24.1, shirt: '#f59e0b', hair: '#78350f' },
+      { gx: 23.6, gy: 21.1, shirt: '#8b5cf6', hair: '#4c1d95' }
+    ];
+    for (const n of npcs) {
+      renderables.push({
+        depth: n.gx + n.gy,
+        draw: () => drawNpcCharacter(n.gx, n.gy, n.shirt, n.hair)
+      });
+    }
+
+    renderables.push({
+      depth: state.player.gx + state.player.gy,
+      draw: () => drawPlayer()
+    });
+
+    renderables.sort((a, b) => a.depth - b.depth);
+    for (const item of renderables) {
+      item.draw();
+    }
+
+    updateAndDrawParticles(0.016);
+    if (activeTargetId) {
+      drawWaypointArrow(activeTargetId);
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     11. INPUT HANDLING (KEYBOARD + VIRTUAL JOYSTICK + TAP-TO-WALK)
+     -------------------------------------------------------------------------- */
+  const keys = {};
+  let joyVec = { x: 0, y: 0 };
+  let walkTarget = null;
+
+  window.addEventListener('keydown', (e) => {
+    keys[e.code] = true;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+      if (state.running && !state.modalOpen) e.preventDefault();
+    }
+    if (e.code === 'Escape' && state.running) {
+      if (state.modalOpen && !state.paused) {
+        closeModal();
+      } else {
+        togglePause();
+      }
+    }
+    if ((e.code === 'KeyE' || e.code === 'Enter') && state.running && !state.paused && !state.modalOpen) {
+      handleSmartAction();
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    keys[e.code] = false;
+  });
+
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!state.running || state.paused || state.modalOpen) return;
+    audio.init();
+    const rect = canvas.getBoundingClientRect();
+    const clickX = e.clientX - rect.left + state.camera.x;
+    const clickY = e.clientY - rect.top + state.camera.y;
+    const gridPos = isoToGrid(clickX, clickY);
+    if (gridPos.gx >= 1 && gridPos.gy >= 1 && gridPos.gx < MAP_SIZE - 1 && gridPos.gy < MAP_SIZE - 1) {
+      walkTarget = { gx: gridPos.gx, gy: gridPos.gy };
+      spawnBurstParticles(gridPos.gx, gridPos.gy, '#2563eb', 6);
+    }
+  });
+
+  const joystickZone = document.getElementById('joystickZone');
+  const joystickKnob = document.getElementById('joystickKnob');
+  let joyActive = false;
+
+  function handleJoystickMove(clientX, clientY) {
+    const rect = joystickZone.getBoundingClientRect();
+    const centerX = rect.left + rect.width * 0.5;
+    const centerY = rect.top + rect.height * 0.5;
+    const maxR = rect.width * 0.36;
+    let dx = clientX - centerX;
+    let dy = clientY - centerY;
+    const dist = Math.hypot(dx, dy);
+    if (dist > maxR) {
+      dx = (dx / dist) * maxR;
+      dy = (dy / dist) * maxR;
+    }
+    joystickKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+    joyVec.x = dx / maxR;
+    joyVec.y = dy / maxR;
+    walkTarget = null;
+  }
+
+  function resetJoystick() {
+    joyActive = false;
+    joyVec.x = 0;
+    joyVec.y = 0;
+    joystickKnob.style.transform = 'translate(0px, 0px)';
+  }
+
+  joystickZone.addEventListener('pointerdown', (e) => {
+    e.stopPropagation();
+    audio.init();
+    joyActive = true;
+    joystickZone.setPointerCapture(e.pointerId);
+    handleJoystickMove(e.clientX, e.clientY);
+  });
+
+  joystickZone.addEventListener('pointermove', (e) => {
+    if (!joyActive) return;
+    handleJoystickMove(e.clientX, e.clientY);
+  });
+
+  joystickZone.addEventListener('pointerup', resetJoystick);
+  joystickZone.addEventListener('pointercancel', resetJoystick);
+
+  function updatePlayerMovement(dt) {
+    let inputX = joyVec.x;
+    let inputY = joyVec.y;
+
+    if (keys['KeyW'] || keys['ArrowUp']) inputY -= 1;
+    if (keys['KeyS'] || keys['ArrowDown']) inputY += 1;
+    if (keys['KeyA'] || keys['ArrowLeft']) inputX -= 1;
+    if (keys['KeyD'] || keys['ArrowRight']) inputX += 1;
+
+    let moveGx = 0;
+    let moveGy = 0;
+
+    if (Math.hypot(inputX, inputY) > 0.12) {
+      walkTarget = null;
+      const len = Math.hypot(inputX, inputY);
+      const nx = inputX / Math.max(len, 1);
+      const ny = inputY / Math.max(len, 1);
+      moveGx = nx + ny;
+      moveGy = ny - nx;
+      const gLen = Math.hypot(moveGx, moveGy) || 1;
+      moveGx /= gLen;
+      moveGy /= gLen;
+    } else if (walkTarget) {
+      const dx = walkTarget.gx - state.player.gx;
+      const dy = walkTarget.gy - state.player.gy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 0.25) {
+        walkTarget = null;
+        const near = findNearestBuilding();
+        if (near) triggerInteraction();
+      } else {
+        moveGx = dx / dist;
+        moveGy = dy / dist;
+      }
+    }
+
+    state.player.vx = moveGx * state.player.speed;
+    state.player.vy = moveGy * state.player.speed;
+
+    if (Math.hypot(state.player.vx, state.player.vy) > 0.05) {
+      const nextGx = state.player.gx + state.player.vx * dt;
+      const nextGy = state.player.gy + state.player.vy * dt;
+
+      if (!isBlocked(nextGx, state.player.gy)) {
+        state.player.gx = nextGx;
+      }
+      if (!isBlocked(state.player.gx, nextGy)) {
+        state.player.gy = nextGy;
+      }
+
+      state.player.walkFrame += dt * 28;
+      state.player.stepTimer += dt;
+      if (state.player.stepTimer > 0.28) {
+        state.player.stepTimer = 0;
+        audio.sfxStep();
+      }
+    }
+
+    const isoP = gridToIso(state.player.gx, state.player.gy);
+    const targetCamX = isoP.x - viewW * 0.5;
+    const targetCamY = isoP.y - viewH * 0.52;
+    state.camera.x += (targetCamX - state.camera.x) * Math.min(1, dt * 10);
+    state.camera.y += (targetCamY - state.camera.y) * Math.min(1, dt * 10);
+
+    // Smart Contextual Bottom Bar & Primary Action Button
+    const near = findNearestBuilding();
+    state.nearbyBuilding = near;
+    const smartBtn = document.getElementById('btnSmartAction');
+    const smartIcon = document.getElementById('btnSmartIcon');
+    const smartLabel = document.getElementById('btnSmartLabel');
+    const nearbyName = document.getElementById('nearbyName');
+    const nearbyHint = document.getElementById('nearbyHint');
+
+    if (near) {
+      smartBtn.classList.add('ready-talk');
+      smartIcon.textContent = '💬';
+      smartLabel.textContent = `ENTER ${near.short}`;
+      nearbyName.textContent = `📍 At ${near.name}`;
+      nearbyHint.textContent = state.frenchHelp
+        ? 'Tap ENTER or press [E] • Appuyez pour entrer'
+        : 'Tap the orange button or press [E] to start';
+    } else {
+      smartBtn.classList.remove('ready-talk');
+      if (state.mode === 'MISSION') {
+        smartIcon.textContent = '⚡';
+        smartLabel.textContent = 'NEXT STOP';
+        nearbyName.textContent = 'Tap anywhere on campus to walk';
+        nearbyHint.textContent = state.frenchHelp
+          ? 'Or tap NEXT STOP to jump straight there • Ou cliquez sur NEXT STOP'
+          : 'Or tap NEXT STOP on the right to jump straight to your mission';
+      } else {
+        smartIcon.textContent = '🗺';
+        smartLabel.textContent = 'CAMPUS MAP';
+        nearbyName.textContent = 'Free Explorer Mode';
+        nearbyHint.textContent = 'Walk to any building or open the Campus Map';
+      }
+    }
+  }
+
+  function handleSmartAction() {
+    if (state.nearbyBuilding) {
+      triggerInteraction();
+    } else if (state.mode === 'MISSION') {
+      const phase = getCurrentMissionPhase();
+      if (phase) teleportToBuilding(phase.targetBuildingId);
+    } else {
+      openCampusDirectoryModal();
+    }
+  }
+
+  /* --------------------------------------------------------------------------
+     12. EDUCATIONAL ACTIVITIES, NPC DIALOGUES & SPEECH ENGINE
+     -------------------------------------------------------------------------- */
+  function getNextQuestion(category) {
+    const bank = QUESTION_BANK[category][state.cefr];
+    const key = `${category}_${state.cefr}`;
+    const idx = state.questionCursor[key] || 0;
+    state.questionCursor[key] = (idx + 1) % bank.length;
+    return bank[idx];
+  }
+
+  function recordBuildingVisit(buildingId) {
+    if (!saveData.visitedBuildings.includes(buildingId)) {
+      saveData.visitedBuildings.push(buildingId);
+      if (saveData.visitedBuildings.length >= 6) {
+        unlockBadge('all_campus');
+      }
+      persistSaveData();
+    }
+  }
+
+  function triggerInteraction() {
+    const b = state.nearbyBuilding;
+    if (!b) return;
+
+    audio.sfxInteract();
+    recordBuildingVisit(b.id);
+
+    if (b.id === 'HUB') {
+      openNpcScenarioModal(NPC_SCENARIOS.HUB, () => {
+        state.completedPhases.add(0);
+        if (state.mode === 'MISSION' && state.timeRemaining > 160) {
+          state.timeRemaining = 160;
+          audio.sfxPhaseUp();
+          showToast('🚀 Next Stop: VOCABULARY GARDEN!');
+        }
+      });
+    } else if (b.id === 'VOCAB') {
+      openQuizModal('VOCABULARY', '🌿 VOCABULARY GARDEN', b.id);
+    } else if (b.id === 'GRAMMAR') {
+      openQuizModal('GRAMMAR', '🏛 GRAMMAR CLASSROOM', b.id);
+    } else if (b.id === 'LISTENING') {
+      openListeningModal();
+    } else if (b.id === 'SPEAKING') {
+      openSpeakingModal();
+    } else if (b.id === 'LIBRARY' || b.id === 'WRITING') {
+      openNpcScenarioModal(NPC_SCENARIOS.LIBRARY_CHAT, () => {
+        openQuizModal('READING_WRITING', b.id === 'LIBRARY' ? '📚 READING LIBRARY' : '✍ WRITING OFFICE', b.id);
+      });
+    } else if (b.id === 'CULTURE') {
+      openQuizModal('CULTURE', '🗽 AMERICAN CULTURE ZONE', b.id);
+    } else if (b.id === 'ARENA') {
+      openFinalArenaModal();
+    } else if (b.id === 'TROPHIES') {
+      openAchievementsModal();
+    }
+  }
+
+  function openNpcScenarioModal(scenario, onContinue) {
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div class="npc-header">
+        <div class="npc-portrait" style="display:flex;align-items:center;justify-content:center;font-size:30px;background:${scenario.avatarBg};">
+          🧑‍🏫
+        </div>
+        <div>
+          <div style="font-size:1.1rem;font-weight:800;color:#0f172a;">${scenario.npcName}</div>
+          <div style="font-size:0.85rem;color:#2563eb;font-weight:600;">${scenario.role}</div>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1.5px solid #cbd5e1;font-size:0.98rem;line-height:1.55;">
+        "${scenario.greeting}"
+        ${state.frenchHelp ? `<div style="color:#475569;font-size:0.88rem;margin-top:6px;">🇫🇷 ${scenario.frSub}</div>` : ''}
+      </div>
+
+      <div style="margin-top:14px;font-weight:800;font-size:0.82rem;color:#2563eb;text-transform:uppercase;">
+        💬 Choose your reply:
+      </div>
+      <div style="font-size:0.95rem;margin-top:4px;font-weight:600;">${scenario.dialoguePrompt}</div>
+
+      <div class="option-grid" id="npcChoices">
+        ${scenario.choices.map((c, idx) => `
+          <button class="retro-btn option-btn" data-idx="${idx}">
+            ${c.text}
+          </button>
+        `).join('')}
+      </div>
+      <div id="npcFeedback"></div>
+    `;
+
+    document.getElementById('modalLayer').classList.remove('hidden');
+
+    modal.querySelectorAll('#npcChoices button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.idx);
+        const choice = scenario.choices[idx];
+        modal.querySelectorAll('#npcChoices button').forEach(b => b.disabled = true);
+        btn.classList.add('correct');
+        state.score += choice.bonus;
+        updateHud();
+        audio.sfxCorrect();
+
+        document.getElementById('npcFeedback').innerHTML = `
+          <div class="feedback-box" style="border-left-color:#059669;background:#ecfdf5;">
+            <strong>${scenario.npcName}:</strong> "${choice.reply}"
+            <div style="color:#059669;font-weight:800;margin-top:6px;">+${choice.bonus} Communication Points!</div>
+          </div>
+          <div style="margin-top:14px;text-align:right;">
+            <button id="btnNpcNext" class="retro-btn btn-green">CONTINUE ➔</button>
+          </div>
+        `;
+
+        document.getElementById('btnNpcNext').addEventListener('click', () => {
+          closeModal();
+          if (onContinue) onContinue();
+        });
+      });
+    });
+  }
+
+  function openQuizModal(skillKey, headerTitle, buildingId) {
+    state.modalOpen = true;
+    const q = getNextQuestion(skillKey);
+    const modal = document.getElementById('modalContent');
+
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <div>
+          <span class="badge-pill">${state.cefr} LEVEL</span>
+          <div style="font-size:1.15rem;font-weight:900;color:#0f172a;margin-top:4px;">${headerTitle}</div>
+        </div>
+        <button id="btnCloseQuiz" class="retro-btn btn-slate btn-sm" aria-label="Close">✕</button>
+      </div>
+
+      <div style="font-size:0.85rem;color:#475569;margin-bottom:10px;">
+        🎯 <strong>Goal:</strong> ${q.objective}
+        ${state.frenchHelp && q.frHint ? `<br><span style="color:#64748b;">🇫🇷 ${q.frHint}</span>` : ''}
+      </div>
+
+      ${q.passage ? `
+        <div style="background:#f8fafc;border:1.5px solid #cbd5e1;padding:12px;border-radius:12px;font-size:0.95rem;margin-bottom:12px;line-height:1.5;">
+          ${q.passage}
+        </div>
+      ` : ''}
+
+      <div style="display:flex;gap:14px;align-items:center;background:#eff6ff;border:1.5px solid #bfdbfe;padding:14px;border-radius:12px;">
+        ${q.icon ? `<div style="font-size:2rem;flex-shrink:0;">${q.icon}</div>` : ''}
+        <div style="font-size:1rem;font-weight:700;line-height:1.45;color:#0f172a;">${q.prompt}</div>
+      </div>
+
+      <div class="option-grid two-col" id="quizOptions">
+        ${q.options.map((opt, idx) => `
+          <button class="retro-btn option-btn" data-idx="${idx}">
+            <strong style="color:#2563eb;">${String.fromCharCode(65 + idx)}.</strong>&nbsp;${opt}
+          </button>
+        `).join('')}
+      </div>
+
+      <div id="quizFeedback"></div>
+    `;
+
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnCloseQuiz').addEventListener('click', closeModal);
+
+    modal.querySelectorAll('#quizOptions button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chosen = Number(btn.dataset.idx);
+        const isRight = chosen === q.answer;
+        modal.querySelectorAll('#quizOptions button').forEach((b, i) => {
+          b.disabled = true;
+          if (i === q.answer) b.classList.add('correct');
+        });
+
+        state.skillStats[skillKey].total++;
+        if (isRight) {
+          btn.classList.add('correct');
+          state.score += 100;
+          state.correctCount++;
+          state.skillStats[skillKey].correct++;
+          audio.sfxCorrect();
+          spawnBurstParticles(state.player.gx, state.player.gy, '#059669', 12);
+        } else {
+          btn.classList.add('wrong');
+          state.wrongCount++;
+          audio.sfxWrong();
+        }
+        updateHud();
+
+        document.getElementById('quizFeedback').innerHTML = `
+          <div class="feedback-box" style="border-left-color:${isRight ? '#059669' : '#e11d48'};background:${isRight ? '#ecfdf5' : '#fff1f2'};">
+            <div style="font-weight:800;color:${isRight ? '#059669' : '#be123c'};margin-bottom:4px;">
+              ${isRight ? '✅ Correct! (+100 pts)' : '💡 Good try! Here is why:'}
+            </div>
+            <div>${q.explanation}</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap;">
+            <button id="btnAnotherQ" class="retro-btn btn-slate btn-sm">↻ Practice 1 More</button>
+            <button id="btnDoneQ" class="retro-btn btn-green">CONTINUE ➔</button>
+          </div>
+        `;
+
+        document.getElementById('btnAnotherQ').addEventListener('click', () => {
+          openQuizModal(skillKey, headerTitle, buildingId);
+        });
+        document.getElementById('btnDoneQ').addEventListener('click', () => {
+          closeModal();
+          suggestNextZone(buildingId);
+        });
+      });
+    });
+  }
+
+  /* --------------------------------------------------------------------------
+     13. LISTENING & SPEAKING ACTIVITIES (WITH ACCESSIBLE FALLBACKS)
+     -------------------------------------------------------------------------- */
+  function speakTextWithSynth(text) {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = 0.94;
+        window.speechSynthesis.speak(utter);
+        return true;
+      } catch (e) {}
+    }
+    return false;
+  }
+
+  function openListeningModal() {
+    state.modalOpen = true;
+    const q = getNextQuestion('LISTENING');
+    const modal = document.getElementById('modalContent');
+    const hasTTS = 'speechSynthesis' in window;
+
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <div>
+          <span class="badge-pill">${state.cefr} LISTENING</span>
+          <div style="font-size:1.15rem;font-weight:900;color:#0f172a;margin-top:4px;">🎧 LISTENING LOUNGE</div>
+        </div>
+        <button id="btnCloseListen" class="retro-btn btn-slate btn-sm">✕</button>
+      </div>
+
+      <div style="font-size:0.85rem;color:#475569;margin-bottom:10px;">
+        🎯 <strong>Goal:</strong> ${q.objective}
+        ${state.frenchHelp ? `<br><span style="color:#64748b;">🇫🇷 ${q.frHint}</span>` : ''}
+      </div>
+
+      <div style="background:#fffbeb;border:1.5px solid #fcd34d;padding:14px;border-radius:12px;margin-bottom:12px;">
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;">
+          <button id="btnPlayAudioClip" class="retro-btn btn-gold btn-sm">
+            🔊 ${hasTTS ? 'Play Audio' : 'Audio Unavailable'}
+          </button>
+          <button id="btnShowTranscript" class="retro-btn btn-slate btn-sm">
+            📄 ${hasTTS ? 'Show Text Transcript' : 'Read Transcript'}
+          </button>
+        </div>
+        <div id="transcriptBox" class="${hasTTS ? 'hidden' : ''}" style="margin-top:10px;padding:10px;background:#ffffff;border:1px solid #fde68a;border-radius:8px;font-size:0.92rem;color:#1e293b;line-height:1.5;">
+          <strong>Transcript:</strong> "${q.transcript}"
+        </div>
+      </div>
+
+      <div style="font-size:1rem;font-weight:700;margin-bottom:8px;">${q.prompt}</div>
+
+      <div class="option-grid" id="listenOptions">
+        ${q.options.map((opt, idx) => `
+          <button class="retro-btn option-btn" data-idx="${idx}">
+            <strong style="color:#2563eb;">${String.fromCharCode(65 + idx)}.</strong>&nbsp;${opt}
+          </button>
+        `).join('')}
+      </div>
+      <div id="listenFeedback"></div>
+    `;
+
+    document.getElementById('modalLayer').classList.remove('hidden');
+    if (hasTTS) speakTextWithSynth(q.transcript);
+
+    document.getElementById('btnCloseListen').addEventListener('click', () => {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      closeModal();
+    });
+
+    document.getElementById('btnPlayAudioClip').addEventListener('click', () => {
+      if (!speakTextWithSynth(q.transcript)) {
+        document.getElementById('transcriptBox').classList.remove('hidden');
+        showToast('Audio unavailable — transcript displayed!');
+      }
+    });
+
+    document.getElementById('btnShowTranscript').addEventListener('click', () => {
+      document.getElementById('transcriptBox').classList.toggle('hidden');
+    });
+
+    modal.querySelectorAll('#listenOptions button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chosen = Number(btn.dataset.idx);
+        const isRight = chosen === q.answer;
+        modal.querySelectorAll('#listenOptions button').forEach((b, i) => {
+          b.disabled = true;
+          if (i === q.answer) b.classList.add('correct');
+        });
+
+        state.skillStats.LISTENING.total++;
+        if (isRight) {
+          btn.classList.add('correct');
+          state.score += 110;
+          state.correctCount++;
+          state.skillStats.LISTENING.correct++;
+          audio.sfxCorrect();
+        } else {
+          btn.classList.add('wrong');
+          state.wrongCount++;
+          audio.sfxWrong();
+        }
+        updateHud();
+
+        document.getElementById('listenFeedback').innerHTML = `
+          <div class="feedback-box" style="border-left-color:${isRight ? '#059669' : '#e11d48'};background:${isRight ? '#ecfdf5' : '#fff1f2'};">
+            <strong>${isRight ? '✅ Great Listening! (+110 pts)' : '💡 Review the transcript:'}</strong>
+            <div style="margin-top:4px;">${q.explanation}</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap;">
+            <button id="btnGoSpeakStage" class="retro-btn btn-slate btn-sm">🎤 Try Speaking Stage</button>
+            <button id="btnDoneListen" class="retro-btn btn-green">CONTINUE ➔</button>
+          </div>
+        `;
+
+        document.getElementById('btnGoSpeakStage').addEventListener('click', () => {
+          openSpeakingModal();
+        });
+        document.getElementById('btnDoneListen').addEventListener('click', () => {
+          closeModal();
+          suggestNextZone('LISTENING');
+        });
+      });
+    });
+  }
+
+  function openSpeakingModal() {
+    state.modalOpen = true;
+    const sp = QUESTION_BANK.SPEAKING[state.cefr][0];
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const hasMic = Boolean(SpeechRec);
+    const modal = document.getElementById('modalContent');
+
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <div>
+          <span class="badge-pill">${state.cefr} SPEAKING</span>
+          <div style="font-size:1.15rem;font-weight:900;color:#0f172a;margin-top:4px;">🎤 SPEAKING STAGE</div>
+        </div>
+        <button id="btnCloseSpeak" class="retro-btn btn-slate btn-sm">✕</button>
+      </div>
+
+      <div style="font-size:0.85rem;color:#475569;margin-bottom:10px;">
+        🎯 <strong>Goal:</strong> ${sp.objective}
+        ${state.frenchHelp ? `<br><span style="color:#64748b;">🇫🇷 ${sp.frHint}</span>` : ''}
+      </div>
+
+      <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;padding:14px;border-radius:12px;margin-bottom:12px;">
+        <div style="font-size:0.88rem;color:#475569;margin-bottom:6px;">${sp.prompt}</div>
+        <div style="font-size:1rem;font-weight:700;color:#1e293b;padding:10px;background:#ffffff;border-radius:8px;border:1px solid #e9d5ff;">
+          "${sp.targetPhrase}"
+        </div>
+        <div style="margin-top:8px;">
+          <button id="btnHearModel" class="retro-btn btn-slate btn-sm">🔊 Listen to Model</button>
+        </div>
+      </div>
+
+      <div style="background:#f8fafc;border:1.5px solid #cbd5e1;padding:12px;border-radius:12px;margin-bottom:10px;">
+        <div style="font-size:0.82rem;font-weight:800;color:#059669;margin-bottom:6px;">
+          OPTION A: SPEAK WITH MICROPHONE ${hasMic ? '(Supported)' : '(Not supported in this browser)'}
+        </div>
+        <button id="btnStartMic" class="retro-btn btn-green btn-sm" ${hasMic ? '' : 'disabled'}>
+          🎙 Start Speaking
+        </button>
+        <div id="micStatus" style="font-size:0.85rem;color:#475569;margin-top:6px;"></div>
+      </div>
+
+      <div style="background:#f8fafc;border:1.5px solid #cbd5e1;padding:12px;border-radius:12px;">
+        <div style="font-size:0.82rem;font-weight:800;color:#2563eb;margin-bottom:4px;">
+          OPTION B: WRITTEN RESPONSE (No Microphone Needed)
+        </div>
+        <div style="font-size:0.78rem;color:#64748b;margin-bottom:8px;">
+          Note: Written answers check vocabulary &amp; phrasing (they do not measure spoken pronunciation).
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input id="txtSpeakAlt" type="text" placeholder="Type your response in English..."
+            style="flex:1 1 200px;padding:10px 12px;border-radius:10px;border:1.5px solid #94a3b8;background:#ffffff;color:#1e293b;font-family:inherit;font-size:0.95rem;" />
+          <button id="btnSubmitSpeakText" class="retro-btn btn-gold btn-sm">Submit</button>
+        </div>
+      </div>
+
+      <div id="speakFeedback"></div>
+    `;
+
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnCloseSpeak').addEventListener('click', closeModal);
+    document.getElementById('btnHearModel').addEventListener('click', () => speakTextWithSynth(sp.targetPhrase));
+
+    function evaluateSpeechOrText(rawInput, isVoice) {
+      const cleaned = (rawInput || '').toLowerCase().trim();
+      if (cleaned.length < 4) {
+        showToast('Please say or type a complete sentence in English!');
+        return;
+      }
+      const matched = sp.keywords.filter(kw => cleaned.includes(kw));
+      const scoreGain = matched.length >= 2 ? 120 : 80;
+      state.score += scoreGain;
+      state.correctCount++;
+      state.skillStats.SPEAKING = {
+        completed: true,
+        method: isVoice ? 'Voice Microphone Verified' : 'Written Alternative'
+      };
+      updateHud();
+      audio.sfxCorrect();
+
+      document.getElementById('speakFeedback').innerHTML = `
+        <div class="feedback-box" style="border-left-color:#059669;background:#ecfdf5;">
+          <div style="font-weight:800;color:#059669;">
+            ✅ ${isVoice ? 'Voice Captured!' : 'Response Recorded!'} (+${scoreGain} pts)
+          </div>
+          <div style="margin-top:4px;">Your response: <em>"${rawInput}"</em></div>
+        </div>
+        <div style="margin-top:12px;text-align:right;">
+          <button id="btnDoneSpeak" class="retro-btn btn-green">CONTINUE ➔</button>
+        </div>
+      `;
+      document.getElementById('btnDoneSpeak').addEventListener('click', () => {
+        closeModal();
+        suggestNextZone('SPEAKING');
+      });
+    }
+
+    if (hasMic) {
+      document.getElementById('btnStartMic').addEventListener('click', () => {
+        try {
+          const rec = new SpeechRec();
+          rec.lang = 'en-US';
+          rec.interimResults = false;
+          rec.maxAlternatives = 1;
+          document.getElementById('micStatus').textContent = '🔴 Listening... Speak clearly in English now!';
+          rec.onresult = (ev) => {
+            const transcript = ev.results[0][0].transcript;
+            document.getElementById('micStatus').textContent = `Heard: "${transcript}"`;
+            evaluateSpeechOrText(transcript, true);
+          };
+          rec.onerror = () => {
+            document.getElementById('micStatus').textContent = 'Mic unavailable. Please use Option B below!';
+          };
+          rec.start();
+        } catch (err) {
+          document.getElementById('micStatus').textContent = 'Speech recognition unavailable. Use Option B below!';
+        }
+      });
+    }
+
+    document.getElementById('btnSubmitSpeakText').addEventListener('click', () => {
+      evaluateSpeechOrText(document.getElementById('txtSpeakAlt').value, false);
+    });
+  }
+
+  function openFinalArenaModal() {
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div style="text-align:center;padding:8px 0;">
+        <div style="font-size:2.8rem;">🏆</div>
+        <h2 style="margin:8px 0;color:#0f172a;">FINAL CHALLENGE ARENA</h2>
+        <p style="font-size:0.95rem;color:#475569;line-height:1.5;max-width:440px;margin:0 auto 18px auto;">
+          You reached the Championship Dome! Finish now to claim your +150 pt Arena Bonus and view your complete Skill Report.
+        </p>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <button id="btnKeepExploring" class="retro-btn btn-slate">Keep Exploring</button>
+          <button id="btnFinishNow" class="retro-btn btn-green">Complete &amp; View Results ★</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnKeepExploring').addEventListener('click', closeModal);
+    document.getElementById('btnFinishNow').addEventListener('click', () => {
+      state.score += 150;
+      closeModal();
+      finishSession();
+    });
+  }
+
+  function suggestNextZone(currentId) {
+    if (state.mode !== 'MISSION') return;
+    const order = ['HUB', 'VOCAB', 'GRAMMAR', 'LISTENING', 'CULTURE', 'ARENA'];
+    const idx = order.indexOf(currentId);
+    if (idx >= 0 && idx < order.length - 1) {
+      const nextB = CAMPUS_BUILDINGS.find(x => x.id === order[idx + 1]);
+      if (nextB) {
+        showToast(`Next Stop: ${nextB.name} (Tap NEXT STOP to jump!)`);
+      }
+    }
+  }
+
+  function closeModal() {
+    state.modalOpen = false;
+    document.getElementById('modalLayer').classList.add('hidden');
+  }
+
+  /* --------------------------------------------------------------------------
+     14. MISSION TIMER, HUD UPDATES & FINAL RESULTS REPORT
+     -------------------------------------------------------------------------- */
+  function getCurrentMissionPhase() {
+    if (state.mode !== 'MISSION') return null;
+    const t = state.timeRemaining;
+    for (const p of MISSION_PHASES) {
+      if (t <= p.startSec && t > p.endSec) return p;
+    }
+    return MISSION_PHASES[MISSION_PHASES.length - 1];
+  }
+
+  function formatTime(sec) {
+    const clamped = Math.max(0, Math.ceil(sec));
+    const m = Math.floor(clamped / 60);
+    const s = clamped % 60;
+    return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  let lastPhaseIndex = -1;
+
+  function updateHud() {
+    const timerEl = document.getElementById('hudTimer');
+    if (state.mode === 'MISSION') {
+      timerEl.textContent = formatTime(state.timeRemaining);
+      if (state.timeRemaining <= 15) {
+        timerEl.classList.add('timer-urgent');
+      } else {
+        timerEl.classList.remove('timer-urgent');
+      }
+
+      const phase = getCurrentMissionPhase();
+      if (phase) {
+        if (phase.index !== lastPhaseIndex) {
+          lastPhaseIndex = phase.index;
+          if (phase.index > 0) {
+            audio.sfxPhaseUp();
+            showToast(`⏰ ${phase.title}`);
+          }
+        }
+        document.getElementById('hudPhaseTag').textContent = phase.tag;
+        document.getElementById('hudPhaseTitle').textContent = phase.title;
+        document.getElementById('hudPhaseObjective').textContent = state.frenchHelp
+          ? `${phase.objective} • ${phase.frObjective}`
+          : phase.objective;
+        const pct = ((180 - state.timeRemaining) / 180) * 100;
+        document.getElementById('hudMissionProgress').style.width = `${Math.min(100, Math.max(0, pct))}%`;
+      }
+    } else {
+      timerEl.textContent = 'FREE';
+      timerEl.classList.remove('timer-urgent');
+      document.getElementById('hudPhaseTag').textContent = 'EXPLORER';
+      document.getElementById('hudPhaseTitle').textContent = 'FREE CAMPUS PRACTICE';
+      document.getElementById('hudPhaseObjective').textContent = 'Visit any of the 10 campus locations at your own pace';
+      document.getElementById('hudMissionProgress').style.width = '100%';
+    }
+
+    document.getElementById('hudScore').textContent = state.score;
+    document.getElementById('hudLevelBadge').textContent = state.cefr;
+  }
+
+  function finishSession() {
+    state.running = false;
+    audio.stopBgm();
+    audio.sfxFanfare();
+
+    const earnedXp = Math.max(50, Math.round(state.score * 0.5));
+    saveData.xp += earnedXp;
+    saveData.sessionsPlayed++;
+    if (state.score > saveData.bestScore) {
+      saveData.bestScore = state.score;
+    }
+
+    unlockBadge('first_steps');
+    if (state.skillStats.VOCABULARY.total > 0 && state.skillStats.VOCABULARY.correct === state.skillStats.VOCABULARY.total) {
+      unlockBadge('vocab_wizard');
+    }
+    if (state.skillStats.GRAMMAR.total > 0 && state.skillStats.GRAMMAR.correct === state.skillStats.GRAMMAR.total) {
+      unlockBadge('grammar_guru');
+    }
+    if (state.skillStats.LISTENING.correct > 0 || state.skillStats.SPEAKING.completed) {
+      unlockBadge('active_listener');
+    }
+    if (state.skillStats.CULTURE.correct > 0) {
+      unlockBadge('usa_scholar');
+    }
+    if (state.mode === 'MISSION' && state.score >= 600) {
+      unlockBadge('speed_ace');
+    }
+    if (state.cefr === 'B1' && state.correctCount >= 3) {
+      unlockBadge('b1_master');
+    }
+    persistSaveData();
+
+    const recs = [];
+    if (state.skillStats.VOCABULARY.correct < state.skillStats.VOCABULARY.total) {
+      recs.push('Review context clues in the Vocabulary Garden.');
+    }
+    if (state.skillStats.GRAMMAR.correct < state.skillStats.GRAMMAR.total) {
+      recs.push('Practice verb tenses & sentence structure in the Grammar Classroom.');
+    }
+    if (!state.skillStats.SPEAKING.completed) {
+      recs.push('Visit the Speaking Stage to try voice or written expression.');
+    }
+    if (recs.length === 0) {
+      recs.push('Great balance across skills! Try advancing to the next CEFR level.');
+    }
+
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div style="text-align:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:12px;margin-bottom:14px;">
+        <div class="logo-badge">SESSION COMPLETE • SKILL REPORT</div>
+        <h2 style="margin:4px 0;font-size:1.6rem;color:#0f172a;">YOUR RESULTS</h2>
+        <div style="font-size:2.2rem;font-weight:900;color:#059669;">${state.score} PTS</div>
+        <div style="font-size:0.88rem;color:#2563eb;font-weight:700;">+${earnedXp} XP Earned • Player Level ${getPlayerLevel(saveData.xp)}</div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom:14px;">
+        <div style="background:#f8fafc;padding:12px;border-radius:12px;border:1px solid #cbd5e1;">
+          <div style="font-weight:800;color:#0f172a;margin-bottom:6px;">📊 Summary</div>
+          <div class="stat-row"><span>CEFR Level:</span><strong>${state.cefr}</strong></div>
+          <div class="stat-row"><span>Correct Answers:</span><strong style="color:#059669;">${state.correctCount}</strong></div>
+          <div class="stat-row"><span>Incorrect Answers:</span><strong style="color:#e11d48;">${state.wrongCount}</strong></div>
+          <div class="stat-row"><span>Personal Best:</span><strong style="color:#d97706;">${saveData.bestScore} PTS</strong></div>
+        </div>
+
+        <div style="background:#f8fafc;padding:12px;border-radius:12px;border:1px solid #cbd5e1;">
+          <div style="font-weight:800;color:#0f172a;margin-bottom:6px;">🎓 Skill Breakdown</div>
+          <div class="stat-row"><span>🌿 Vocabulary:</span><strong>${state.skillStats.VOCABULARY.correct}/${state.skillStats.VOCABULARY.total}</strong></div>
+          <div class="stat-row"><span>🏛 Grammar:</span><strong>${state.skillStats.GRAMMAR.correct}/${state.skillStats.GRAMMAR.total}</strong></div>
+          <div class="stat-row"><span>🎧 Listening:</span><strong>${state.skillStats.LISTENING.correct}/${state.skillStats.LISTENING.total}</strong></div>
+          <div class="stat-row"><span>🎤 Speaking:</span><strong>${state.skillStats.SPEAKING.method}</strong></div>
+          <div class="stat-row"><span>🗽 U.S. Culture:</span><strong>${state.skillStats.CULTURE.correct}/${state.skillStats.CULTURE.total}</strong></div>
+        </div>
+      </div>
+
+      <div class="feedback-box" style="border-left-color:#d97706;background:#fffbeb;margin-bottom:16px;">
+        <strong>💡 Next Step Tip:</strong> ${recs.join(' ')}
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+        <button id="btnPlayAgain" class="retro-btn btn-green">↻ Play Again</button>
+        <button id="btnReturnTitle" class="retro-btn btn-slate">🏠 Main Menu</button>
+      </div>
+    `;
+
+    document.getElementById('modalLayer').classList.remove('hidden');
+
+    document.getElementById('btnPlayAgain').addEventListener('click', () => {
+      closeModal();
+      startNewSession(state.mode);
+    });
+
+    document.getElementById('btnReturnTitle').addEventListener('click', () => {
+      closeModal();
+      document.getElementById('hudLayer').classList.add('hidden');
+      document.getElementById('screenStart').classList.remove('hidden');
+      updateStartScreenStats();
+    });
+  }
+
+  /* --------------------------------------------------------------------------
+     15. UNIFIED MENU / SETTINGS MODAL & CAMPUS DIRECTORY
+     -------------------------------------------------------------------------- */
+  function openCampusDirectoryModal() {
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;">
+        <div style="font-size:1.1rem;font-weight:900;color:#0f172a;">🗺 CAMPUS DIRECTORY (10 LOCATIONS)</div>
+        <button id="btnCloseMap" class="retro-btn btn-slate btn-sm">✕</button>
+      </div>
+      <div style="font-size:0.85rem;color:#475569;margin-top:6px;">
+        Select any location below to walk or teleport straight to its entrance:
+      </div>
+      <div class="map-grid">
+        ${CAMPUS_BUILDINGS.map(b => `
+          <button class="retro-btn btn-slate" data-bid="${b.id}" style="flex-direction:column;align-items:flex-start;padding:10px;text-align:left;">
+            <span style="font-size:0.85rem;color:#2563eb;font-weight:800;">#${b.num} ${b.short}</span>
+            <span style="font-size:0.78rem;color:#475569;font-weight:normal;">${b.desc}</span>
+          </button>
+        `).join('')}
+      </div>
+    `;
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnCloseMap').addEventListener('click', closeModal);
+    modal.querySelectorAll('button[data-bid]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bid = btn.dataset.bid;
+        closeModal();
+        teleportToBuilding(bid);
+      });
+    });
+  }
+
+  function togglePause() {
+    state.paused = !state.paused;
+    if (state.paused) {
+      state.modalOpen = true;
+      const modal = document.getElementById('modalContent');
+      modal.innerHTML = `
+        <div style="text-align:center;">
+          <h2 style="color:#0f172a;margin:0 0 6px 0;">☰ GAME MENU &amp; COMFORT SETTINGS</h2>
+          <p style="font-size:0.88rem;color:#64748b;margin:0 0 16px 0;">Timer is paused while this menu is open.</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:380px;margin:0 auto 16px auto;">
+            <button id="btnMenuMap" class="retro-btn btn-slate btn-sm">🗺 Campus Map</button>
+            <button id="btnMenuAudio" class="retro-btn btn-slate btn-sm">${audio.muted ? '🔇 Unmute Sound' : '🔊 Mute Sound'}</button>
+            <button id="btnMenuCalm" class="retro-btn btn-slate btn-sm">${state.calmMode ? '☀️ Standard View' : '🌿 Calm / Large Text'}</button>
+            <button id="btnMenuFull" class="retro-btn btn-slate btn-sm">⛶ Fullscreen</button>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;max-width:300px;margin:0 auto;">
+            <button id="btnResumeGame" class="retro-btn btn-green">▶ Resume Game</button>
+            <button id="btnRestartGame" class="retro-btn btn-gold">↻ Restart Session</button>
+            <button id="btnQuitToMenu" class="retro-btn btn-red">🏠 Quit to Main Menu</button>
+          </div>
+        </div>
+      `;
+      document.getElementById('modalLayer').classList.remove('hidden');
+
+      document.getElementById('btnMenuMap').addEventListener('click', () => {
+        state.paused = false;
+        openCampusDirectoryModal();
+      });
+
+      document.getElementById('btnMenuAudio').addEventListener('click', (e) => {
+        const muted = audio.toggleMute();
+        e.currentTarget.textContent = muted ? '🔇 Unmute Sound' : '🔊 Mute Sound';
+      });
+
+      document.getElementById('btnMenuCalm').addEventListener('click', (e) => {
+        setCalmComfort(!state.calmMode);
+        e.currentTarget.textContent = state.calmMode ? '☀️ Standard View' : '🌿 Calm / Large Text';
+      });
+
+      document.getElementById('btnMenuFull').addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      });
+
+      document.getElementById('btnResumeGame').addEventListener('click', () => {
+        state.paused = false;
+        state.lastTimestamp = performance.now();
+        closeModal();
+      });
+
+      document.getElementById('btnRestartGame').addEventListener('click', () => {
+        state.paused = false;
+        closeModal();
+        startNewSession(state.mode);
+      });
+
+      document.getElementById('btnQuitToMenu').addEventListener('click', () => {
+        state.paused = false;
+        state.running = false;
+        audio.stopBgm();
+        closeModal();
+        document.getElementById('hudLayer').classList.add('hidden');
+        document.getElementById('screenStart').classList.remove('hidden');
+        updateStartScreenStats();
+      });
+    } else {
+      state.lastTimestamp = performance.now();
+      closeModal();
+    }
+  }
+
+  function openAchievementsModal() {
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <div style="font-size:1.1rem;font-weight:900;color:#0f172a;">🏆 ACHIEVEMENT HALL &amp; BADGES</div>
+        <button id="btnCloseTrophies" class="retro-btn btn-slate btn-sm">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="badge-pill">Level ${getPlayerLevel(saveData.xp)} (${saveData.xp} XP)</span>
+        <span class="badge-pill" style="background:#fef3c7;color:#b45309;">Best: ${saveData.bestScore} PTS</span>
+        <span class="badge-pill" style="background:#d1fae5;color:#047857;">Visited: ${saveData.visitedBuildings.length}/10</span>
+      </div>
+      <div class="grid-2">
+        ${BADGES_CATALOG.map(b => {
+          const unlocked = saveData.badges.includes(b.id);
+          return `
+            <div style="padding:12px;border-radius:12px;border:1.5px solid ${unlocked ? '#f59e0b' : '#cbd5e1'};background:${unlocked ? '#fffbeb' : '#f8fafc'};opacity:${unlocked ? '1' : '0.6'};">
+              <div style="font-size:0.95rem;font-weight:800;color:${unlocked ? '#b45309' : '#475569'};">
+                ${b.icon} ${b.title} ${unlocked ? '✓' : '🔒'}
+              </div>
+              <div style="font-size:0.82rem;color:#475569;margin-top:4px;">${b.desc}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnCloseTrophies').addEventListener('click', closeModal);
+  }
+
+  function openHowToModal() {
+    state.modalOpen = true;
+    const modal = document.getElementById('modalContent');
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid #e2e8f0;padding-bottom:10px;margin-bottom:12px;">
+        <div style="font-size:1.1rem;font-weight:900;color:#0f172a;">❓ QUICK GUIDE &amp; CONTROLS</div>
+        <button id="btnCloseGuide" class="retro-btn btn-slate btn-sm">✕</button>
+      </div>
+      <div class="grid-2" style="font-size:0.88rem;line-height:1.5;">
+        <div style="background:#f8fafc;padding:12px;border-radius:12px;border:1px solid #cbd5e1;">
+          <strong style="color:#2563eb;">💻 Desktop Controls</strong>
+          <ul style="padding-left:18px;margin:6px 0;">
+            <li><strong>WASD / Arrow Keys:</strong> Walk across campus</li>
+            <li><strong>Click Ground:</strong> Auto-walk to spot</li>
+            <li><strong>E or Enter:</strong> Enter building / Talk</li>
+            <li><strong>Escape:</strong> Open Menu &amp; Settings</li>
+          </ul>
+        </div>
+        <div style="background:#f8fafc;padding:12px;border-radius:12px;border:1px solid #cbd5e1;">
+          <strong style="color:#059669;">📱 Mobile &amp; Touch</strong>
+          <ul style="padding-left:18px;margin:6px 0;">
+            <li><strong>Left Joystick:</strong> Smooth 360° movement</li>
+            <li><strong>Tap Ground:</strong> Auto-walk to location</li>
+            <li><strong>Right Green/Orange Button:</strong> Jump to Next Stop or Enter</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:12px;background:#eff6ff;border:1px solid #bfdbfe;padding:12px;border-radius:12px;font-size:0.88rem;line-height:1.5;">
+        <strong style="color:#1d4ed8;">⏱ 3-Minute Mission Flow:</strong><br>
+        1. Campus Welcome → 2. Vocabulary Garden → 3. Grammar Classroom → 4. Listening &amp; Speaking → 5. American Discovery → 6. Final Arena!
+      </div>
+    `;
+    document.getElementById('modalLayer').classList.remove('hidden');
+    document.getElementById('btnCloseGuide').addEventListener('click', closeModal);
+  }
+
+  /* --------------------------------------------------------------------------
+     16. SESSION STARTUP, PILL SELECTORS & MAIN LOOP
+     -------------------------------------------------------------------------- */
+  let toastTimeout = null;
+  function showToast(msg) {
+    const box = document.getElementById('toastBox');
+    box.textContent = msg;
+    box.classList.add('show');
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => box.classList.remove('show'), 2600);
+  }
+
+  function setCalmComfort(enabled) {
+    state.calmMode = enabled;
+    if (enabled) {
+      document.body.classList.add('large-text');
+    } else {
+      document.body.classList.remove('large-text');
+    }
+    resizeCanvas();
+  }
+
+  // Wire Start Menu Pill Groups
+  function setupPillGroup(groupId, onSelect) {
+    const container = document.getElementById(groupId);
+    container.querySelectorAll('.pill-opt').forEach(btn => {
+      btn.addEventListener('click', () => {
+        container.querySelectorAll('.pill-opt').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        onSelect(btn.dataset.val);
+      });
+    });
+  }
+
+  setupPillGroup('levelPills', (val) => { state.cefr = val; });
+  setupPillGroup('langPills', (val) => { state.frenchHelp = (val === 'FR'); });
+  setupPillGroup('comfortPills', (val) => { setCalmComfort(val === 'CALM'); });
+
+  function startNewSession(selectedMode = 'MISSION') {
+    state.mode = selectedMode;
+    state.timeRemaining = 180;
+    state.score = 0;
+    state.correctCount = 0;
+    state.wrongCount = 0;
+    state.completedPhases.clear();
+    lastPhaseIndex = -1;
+    state.skillStats = {
+      VOCABULARY: { correct: 0, total: 0 },
+      GRAMMAR: { correct: 0, total: 0 },
+      LISTENING: { correct: 0, total: 0 },
+      SPEAKING: { completed: false, method: 'Not Attempted' },
+      CULTURE: { correct: 0, total: 0 },
+      READING_WRITING: { correct: 0, total: 0 }
+    };
+
+    state.player.gx = 16.5;
+    state.player.gy = 19.8;
+    walkTarget = null;
+    const isoP = gridToIso(state.player.gx, state.player.gy);
+    state.camera.x = isoP.x - viewW * 0.5;
+    state.camera.y = isoP.y - viewH * 0.52;
+
+    state.running = true;
+    state.paused = false;
+    state.modalOpen = false;
+    state.lastTimestamp = performance.now();
+
+    document.getElementById('screenStart').classList.add('hidden');
+    document.getElementById('hudLayer').classList.remove('hidden');
+
+    audio.init();
+    audio.sfxPhaseUp();
+    audio.startBgm();
+    updateHud();
+    showToast('🎓 Welcome to Campus! Tap ENTER CLUB HUB to meet Coach Maya.');
+  }
+
+  function gameLoop(timestamp) {
+    const dt = Math.min(0.05, (timestamp - state.lastTimestamp) / 1000 || 0.016);
+    state.lastTimestamp = timestamp;
+    state.animTick++;
+
+    if (state.running && !state.paused) {
+      if (!state.modalOpen) {
+        updatePlayerMovement(dt);
+      }
+      if (state.mode === 'MISSION') {
+        state.timeRemaining -= dt;
+        if (state.timeRemaining <= 0) {
+          state.timeRemaining = 0;
+          updateHud();
+          finishSession();
+        } else {
+          updateHud();
+        }
+      }
+    }
+
+    renderWorld();
+    requestAnimationFrame(gameLoop);
+  }
+
+  document.getElementById('btnStartMission').addEventListener('click', () => startNewSession('MISSION'));
+  document.getElementById('btnStartExplore').addEventListener('click', () => startNewSession('EXPLORE'));
+  document.getElementById('btnOpenAchievements').addEventListener('click', openAchievementsModal);
+  document.getElementById('btnOpenHowTo').addEventListener('click', openHowToModal);
+
+  document.getElementById('btnSmartAction').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleSmartAction();
+  });
+
+  document.getElementById('btnPause').addEventListener('click', togglePause);
+
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    setCalmComfort(true);
+  }
+
+  updateStartScreenStats();
+  const initialIso = gridToIso(state.player.gx, state.player.gy);
+  state.camera.x = initialIso.x - viewW * 0.5;
+  state.camera.y = initialIso.y - viewH * 0.52;
+  requestAnimationFrame(gameLoop);
+
+})();
+</script>
+</body>
+</html>
